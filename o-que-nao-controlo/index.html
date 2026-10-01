@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Que Eu Não Controlo · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:    #0D1F40;
+  --blue:    #1E45A8;
+  --blue-md: #2D5CC8;
+  --blue-lt: #E6EEFF;
+  --blue-xl: #F0F4FF;
+  --red:     #C41A2C;
+  --green:   #0F5C35;
+  --amber:   #8B5E10;
+  --bg:      #F2F5FC;
+  --white:   #FFFFFF;
+  --text:    #0D1F40;
+  --muted:   rgba(13,31,64,.45);
+  --border:  rgba(13,31,64,.1);
+  --w: 900px;
+  --h: 1125px;
+}
+
+body {
+  background: #0a0f1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  padding: 24px;
+  gap: 20px;
+}
+
+#stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity .42s ease, transform .42s ease;
+  overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > * { position: relative; z-index: 1; }
+
+/* ── SHAPES decorativos ── */
+.shape-block {
+  position: absolute;
+  z-index: 0;
+  background: var(--navy);
+}
+.shape-stripe {
+  position: absolute;
+  z-index: 0;
+  background: var(--blue-lt);
+}
+
+/* ── Label / pill ── */
+.label {
+  display: inline-block;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  padding: 5px 14px;
+  background: var(--navy);
+  color: #fff;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+.label.blue { background: var(--blue); }
+.label.lt   { background: var(--blue-lt); color: var(--navy); }
+.label.red  { background: var(--red); }
+.label.green{ background: var(--green); }
+.label.inv  { background: rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+
+/* ── Tipografia — Outfit única ── */
+.t-hero {
+  font-size: 92px; font-weight: 900;
+  line-height: .96; letter-spacing: -.04em;
+  color: var(--navy);
+}
+.t-hero em { font-style: normal; color: var(--blue); }
+.t-hero .inv { color: #fff; }
+.t-hero .inv-dim { color: rgba(255,255,255,.25); }
+
+.t-h1 {
+  font-size: 62px; font-weight: 800;
+  line-height: 1.04; letter-spacing: -.03em;
+  color: var(--navy);
+}
+.t-h1 em { font-style: normal; color: var(--blue); }
+.t-h1 .inv { color: #fff; }
+
+.t-h2 {
+  font-size: 40px; font-weight: 700;
+  line-height: 1.1; letter-spacing: -.02em;
+  color: var(--navy);
+}
+.t-h2 em { font-style: normal; color: var(--blue); }
+
+.t-body {
+  font-size: 20px; font-weight: 400;
+  line-height: 1.62; color: var(--muted);
+}
+.t-body strong { font-weight: 700; color: var(--navy); }
+
+.t-small {
+  font-size: 15px; font-weight: 500;
+  line-height: 1.5; color: var(--muted);
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  padding: 22px 24px;
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: var(--navy);
+}
+.card.blue::before { background: var(--blue); }
+.card.red::before  { background: var(--red); }
+.card.green::before{ background: var(--green); }
+.card.amber::before{ background: var(--amber); }
+
+.card-title {
+  font-size: 14px; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--navy);
+  margin-bottom: 10px; opacity: .55;
+}
+.card-value {
+  font-size: 26px; font-weight: 700; color: var(--navy);
+  line-height: 1.15; margin-bottom: 8px;
+}
+.card-body {
+  font-size: 17px; font-weight: 400; color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ── Info row ── */
+.row {
+  display: flex; align-items: flex-start; gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1.5px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+.row-num {
+  font-size: 13px; font-weight: 700; letter-spacing: .1em;
+  color: var(--blue); min-width: 28px; padding-top: 3px;
+}
+.row-title { font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.row-sub   { font-size: 16px; font-weight: 400; color: var(--muted); line-height: 1.5; }
+
+/* ── Big stat ── */
+.big-stat {
+  display: flex; flex-direction: column;
+  padding: 24px;
+  background: var(--navy);
+  color: #fff;
+}
+.big-stat .bs-label { font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 8px; }
+.big-stat .bs-value { font-size: 64px; font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #fff; }
+.big-stat .bs-sub   { font-size: 16px; font-weight: 400; color: rgba(255,255,255,.45); margin-top: 6px; }
+
+/* ── Divider ── */
+.divider { height: 2px; background: var(--border); margin: 20px 0; }
+.divider.navy { background: var(--navy); }
+.divider.blue { background: var(--blue); }
+
+/* ── Slide num / foot ── */
+.snum { position:absolute; bottom:22px; right:28px; font-size:13px; font-weight:600; color:rgba(13,31,64,.18); letter-spacing:.08em; }
+.snum-inv { color:rgba(255,255,255,.2) !important; }
+.sfoot { position:absolute; bottom:20px; left:28px; z-index:10; }
+.sfoot span { font-size:13px; font-weight:500; color:rgba(13,31,64,.28); letter-spacing:.03em; }
+.sfoot-inv span { color:rgba(255,255,255,.25) !important; }
+
+/* ── Progress ── */
+#progress-bar { width: var(--w); height: 3px; background: rgba(255,255,255,.05); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--blue); transition: width .42s ease; }
+
+/* ── Controls ── */
+#controls { display:flex; align-items:center; gap:14px; }
+.btn {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+  color: #888; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; user-select: none;
+}
+.btn:hover   { background: rgba(255,255,255,.14); }
+.btn:disabled { opacity: .2; cursor: default; }
+#counter { font-size:11px; color:#444; min-width:48px; text-align:center; font-weight:600; }
+#btn-print {
+  padding: 8px 16px;
+  background: rgba(30,69,168,.15); border: 1px solid rgba(30,69,168,.3);
+  color: #6B90E8; font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; cursor:pointer;
+  transition:background .2s; font-family:'Outfit',sans-serif;
+}
+#btn-print:hover { background: rgba(30,69,168,.25); }
+
+/* ── Print ── */
+@media print {
+  @page { size: 900px 1125px; margin: 0; }
+  body { background: #0a0f1e !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position:static !important; width:900px !important; height:1125px !important; overflow:visible !important; border-radius:0 !important; box-shadow:none !important; display:block !important; }
+  .slide { position:relative !important; opacity:1 !important; transform:none !important; pointer-events:auto !important; display:flex !important; width:900px !important; height:1125px !important; page-break-after:always; break-after:page; overflow:hidden !important; }
+  .slide.exit { display:none !important; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ─── S1 COVER ─── -->
+  <div class="slide active" id="s1" style="background:#050810;justify-content:flex-start;">
+    <!-- Foto ocupa tela toda — texto fica no topo escuro, controle aparece no centro/baixo -->
+    <img src="cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:.85;">
+    <!-- Gradiente: topo muito escuro para texto, meio transparente para foto, fundo escuro novamente -->
+    <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom, rgba(5,8,16,.97) 0%, rgba(5,8,16,.88) 28%, rgba(5,8,16,.20) 52%, rgba(5,8,16,.55) 82%, rgba(5,8,16,.92) 100%);"></div>
+    <!-- Faixa azul topo -->
+    <div style="position:absolute;top:0;left:0;right:0;height:5px;background:var(--blue);z-index:2;"></div>
+
+    <div style="position:relative;z-index:3;padding:56px 60px 0;">
+      <div class="t-hero" style="margin-bottom:20px;margin-top:8px;">
+        <span class="inv">O que</span><br>
+        <span class="inv">eu não</span><br>
+        <span style="color:#7EB3FF;">controlo</span>
+      </div>
+      <div style="width:52px;height:4px;background:#7EB3FF;margin-bottom:22px;opacity:.6;"></div>
+      <div style="font-size:22px;font-weight:400;line-height:1.65;color:rgba(255,255,255,.42);max-width:480px;">
+        A distinção que separa gestão de risco de administração de ansiedade.
+      </div>
+    </div>
+
+    <div class="snum snum-inv" style="z-index:3;">01 / 08</div>
+    <div class="sfoot sfoot-inv" style="z-index:3;"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S2 O QUE É EXÓGENO ─── -->
+  <div class="slide" id="s2" style="padding:64px 60px 56px;">
+    <!-- Shape topo -->
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--navy);z-index:0;"></div>
+    <div style="position:absolute;top:8px;left:0;width:180px;height:4px;background:var(--blue);z-index:0;"></div>
+
+    <div class="label" style="margin-bottom:28px;">Conceito</div>
+    <div class="t-h1" style="margin-bottom:20px;">O que é <em>exógeno?</em></div>
+
+    <div style="font-size:22px;font-weight:400;line-height:1.65;color:var(--muted);margin-bottom:32px;">
+      Exógeno significa <strong>gerado fora do sistema.</strong> No contexto de um portfólio, é tudo que acontece no mundo e afeta seus ativos sem que você possa interferir.
+    </div>
+
+    <!-- Big concept block -->
+    <div style="background:var(--navy);padding:32px;margin-bottom:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:var(--blue);opacity:.15;transform:rotate(45deg);"></div>
+      <div style="font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px;">Definição</div>
+      <div style="font-size:30px;font-weight:700;color:#fff;line-height:1.3;">
+        Fatores que existem <span style="color:var(--blue-lt);">fora da sua mesa</span> de decisão e chegam como dados.
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="row">
+        <div class="row-num">EX</div>
+        <div>
+          <div class="row-title">Decisão de banco central</div>
+          <div class="row-sub">A taxa sobe ou cai independente do seu portfólio.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num">EX</div>
+        <div>
+          <div class="row-title">Tarifa anunciada de madrugada</div>
+          <div class="row-sub">Nenhum modelo previu. O mercado abriu diferente.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num">EX</div>
+        <div>
+          <div class="row-title">Resultado de eleição</div>
+          <div class="row-sub">Você pode ter opinião. Não pode controlar o resultado.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num">EX</div>
+        <div>
+          <div class="row-title">Fluxo de capital externo</div>
+          <div class="row-sub">Entrada e saída de estrangeiros responde ao mundo, não à sua posição.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">02 / 08</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S3 O QUE É ENDÓGENO ─── -->
+  <div class="slide" id="s3" style="padding:64px 60px 56px;">
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--blue);z-index:0;"></div>
+    <div style="position:absolute;top:8px;right:0;width:180px;height:4px;background:var(--navy);z-index:0;"></div>
+
+    <div class="label blue" style="margin-bottom:28px;">Conceito</div>
+    <div class="t-h1" style="margin-bottom:20px;">O que é <em>endógeno?</em></div>
+
+    <div style="font-size:22px;font-weight:400;line-height:1.65;color:var(--muted);margin-bottom:32px;">
+      Endógeno significa <strong>gerado dentro do sistema.</strong> São as decisões que dependem exclusivamente de você. Você pode revisá-las, calibrá-las e corrigi-las.
+    </div>
+
+    <!-- Big concept block -->
+    <div style="background:var(--blue);padding:32px;margin-bottom:24px;position:relative;overflow:hidden;">
+      <div style="position:absolute;left:-20px;bottom:-20px;width:120px;height:120px;background:var(--navy);opacity:.25;transform:rotate(45deg);"></div>
+      <div style="font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px;">Definição</div>
+      <div style="font-size:30px;font-weight:700;color:#fff;line-height:1.3;">
+        Fatores que <span style="color:var(--blue-lt);">dependem da sua escolha</span> e podem ser ajustados a qualquer momento.
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="row">
+        <div class="row-num" style="color:var(--green);">EN</div>
+        <div>
+          <div class="row-title">Tamanho da posição</div>
+          <div class="row-sub">Quanto você carrega de cada ativo.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num" style="color:var(--green);">EN</div>
+        <div>
+          <div class="row-title">Estrutura de hedge</div>
+          <div class="row-sub">Quais riscos você transfere e quais assume.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num" style="color:var(--green);">EN</div>
+        <div>
+          <div class="row-title">Limite de perda</div>
+          <div class="row-sub">Onde você sai, definido antes de entrar.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-num" style="color:var(--green);">EN</div>
+        <div>
+          <div class="row-title">Processo de decisão</div>
+          <div class="row-sub">Como você reage ao ambiente: com regras ou com emoção.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">03 / 08</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S4 A CONFUSÃO ─── -->
+  <div class="slide" id="s4" style="padding:64px 60px 56px;">
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--red);z-index:0;"></div>
+
+    <div class="label red" style="margin-bottom:28px;">O problema</div>
+    <div class="t-h1" style="margin-bottom:8px;">O erro que <em style="color:var(--red);">custa caro</em></div>
+    <div style="font-size:22px;font-weight:400;line-height:1.6;color:var(--muted);margin-bottom:32px;">
+      A maioria não erra na análise. Erra em confundir o que é exógeno com o que é endógeno.
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="card red">
+        <div class="card-title">Erro 1: Tratar exógeno como controlável</div>
+        <div class="card-value" style="font-size:21px;color:var(--red);">Convicção no BC. Posição grande. BC surpreende.</div>
+        <div class="card-body" style="margin-top:10px;">O erro não foi a visão. Foi o tamanho da posição para o nível de incerteza.</div>
+      </div>
+
+      <div class="card" style="--card-color:var(--amber);" class="card amber">
+        <div class="card-title">Erro 2: Abandonar o endógeno na turbulência</div>
+        <div class="card-value" style="font-size:21px;color:var(--amber);">Largar o processo de sizing no estresse.</div>
+        <div class="card-body" style="margin-top:10px;">É exatamente quando o processo importa mais. Não quando é mais fácil segui-lo.</div>
+      </div>
+
+      <!-- Padrão -->
+      <div style="background:var(--blue-xl);border:1.5px solid var(--blue-lt);padding:24px;position:relative;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--navy);"></div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.4;margin-bottom:12px;">O padrão do desastre</div>
+        <div style="font-size:18px;font-weight:400;color:var(--muted);line-height:1.6;">
+          Convicção forte numa variável exógena.<br>
+          Posição desproporcional à incerteza.<br>
+          Evento contraria a visão.<br>
+          <strong style="color:var(--navy);">Perda expressiva. Busca por culpado externo.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">04 / 08</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S5 A ALAVANCA ─── -->
+  <div class="slide" id="s5" style="padding:64px 60px 56px;">
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--blue);z-index:0;"></div>
+
+    <div class="label blue" style="margin-bottom:28px;">A única alavanca real</div>
+    <div class="t-h1" style="margin-bottom:20px;"><em>Position sizing</em> como resposta ao exógeno</div>
+
+    <!-- Formula block -->
+    <div style="background:var(--navy);padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:0;top:0;width:8px;bottom:0;background:var(--blue);"></div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:14px;">A relação fundamental</div>
+      <div style="font-size:38px;font-weight:800;color:#fff;letter-spacing:-.01em;margin-bottom:6px;">σ_carteira = <span style="color:var(--blue-lt);">w</span> × σ_vol</div>
+      <div style="font-size:16px;font-weight:400;color:rgba(255,255,255,.38);">w = tamanho da posição · σ_vol = volatilidade do ativo</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0;margin-bottom:24px;">
+      <div class="row">
+        <div style="min-width:100px;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);padding-top:3px;">Não controlo</div>
+        <div>
+          <div class="row-title">Volatilidade do ativo (σ_vol)</div>
+          <div class="row-sub">Determinada pelo mercado. Chega como dado.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div style="min-width:100px;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);padding-top:3px;">Controlo</div>
+        <div>
+          <div class="row-title">Tamanho da posição (w)</div>
+          <div class="row-sub">Minha única alavanca real sobre o risco realizado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card blue">
+        <div class="card-title">Quando vol sobe</div>
+        <div class="card-body">Recalibro o tamanho para manter o risco da carteira constante. Não é saída. É ajuste. A direção da vol não muda o cálculo.</div>
+      </div>
+      <div class="card green">
+        <div class="card-title">Quando vol cai</div>
+        <div class="card-body">O custo de carregamento caiu. Posso aumentar a posição sem ampliar o risco total da carteira.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:18px 22px;background:var(--blue-xl);border:1.5px solid var(--blue-lt);">
+      <div style="font-size:19px;font-weight:600;color:var(--navy);line-height:1.5;">
+        O alvo é σ_carteira estável. w responde à vol do ativo, para cima e para baixo.
+      </div>
+    </div>
+
+    <div class="snum">05 / 08</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S6 EPICTETO ─── -->
+  <div class="slide" id="s6" style="background:var(--navy);padding:64px 60px 56px;">
+    <!-- shape retangular direita -->
+    <div style="position:absolute;right:0;top:0;width:8px;bottom:0;background:var(--blue);z-index:0;"></div>
+    <div style="position:absolute;right:8px;top:0;width:320px;height:320px;background:var(--blue);opacity:.07;z-index:0;"></div>
+
+    <div class="label inv" style="margin-bottom:36px;">Dois mil anos antes</div>
+
+    <div style="font-size:66px;font-weight:900;line-height:1.02;letter-spacing:-.035em;color:#fff;margin-bottom:8px;">
+      "Algumas coisas<br>dependem de nós.
+    </div>
+    <div style="font-size:66px;font-weight:900;line-height:1.02;letter-spacing:-.035em;color:rgba(255,255,255,.2);margin-bottom:16px;">
+      Outras, não."
+    </div>
+    <div style="font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:40px;">Epicteto · século I d.C.</div>
+
+    <div style="height:2px;background:rgba(255,255,255,.08);margin-bottom:32px;"></div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div style="padding:22px 24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--blue-lt);">
+        <div style="font-size:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Epicteto</div>
+        <div style="font-size:18px;font-weight:400;color:rgba(255,255,255,.7);line-height:1.6;">Distinguiu o que depende da vontade do que é externo. Filosofia estoica não é resignação. É clareza sobre onde aplicar energia.</div>
+      </div>
+      <div style="padding:22px 24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid rgba(255,255,255,.25);">
+        <div style="font-size:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Marco Aurélio</div>
+        <div style="font-size:18px;font-weight:400;color:rgba(255,255,255,.7);line-height:1.6;">Imperador enfrentando guerras, pragas e crises fiscais. Ação rigorosa no controlável, aceitação do incontrolável. Praticado diariamente.</div>
+      </div>
+      <div style="padding:22px 24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--blue);">
+        <div style="font-size:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">O gestor profissional</div>
+        <div style="font-size:18px;font-weight:400;color:rgba(255,255,255,.7);line-height:1.6;">Mesmo framework, contexto diferente. Não luta contra o mercado. Define o que controla e age com rigor. Aceita o resto como dado.</div>
+      </div>
+    </div>
+
+    <div class="snum snum-inv">06 / 08</div>
+    <div class="sfoot sfoot-inv"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S7 FRAMEWORK ─── -->
+  <div class="slide" id="s7" style="padding:64px 60px 56px;">
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--navy);z-index:0;"></div>
+
+    <div class="label" style="margin-bottom:28px;">Framework</div>
+    <div class="t-h1" style="margin-bottom:20px;">Como pensar <em>na prática</em></div>
+    <div style="font-size:21px;font-weight:400;line-height:1.62;color:var(--muted);margin-bottom:32px;">
+      Antes de qualquer decisão, faça a separação.
+    </div>
+
+    <!-- Tabela dois lados -->
+    <div style="display:flex;gap:0;margin-bottom:28px;">
+      <div style="flex:1;background:rgba(196,26,44,.04);border:1.5px solid rgba(196,26,44,.14);border-right:none;padding:22px;">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Exógeno: aceite</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(196,26,44,.3);">Volatilidade de mercado</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(196,26,44,.3);">Macro e política monetária</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(196,26,44,.3);">Geopolítica e eleições</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(196,26,44,.3);">Fluxo externo e liquidez</div>
+        </div>
+      </div>
+      <div style="flex:1;background:rgba(15,92,53,.04);border:1.5px solid rgba(15,92,53,.14);padding:22px;">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:16px;">Endógeno: gerencie</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(15,92,53,.35);">Tamanho da posição</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(15,92,53,.35);">Estrutura de hedge</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(15,92,53,.35);">Limite de perda</div>
+          <div style="font-size:18px;font-weight:500;color:var(--navy);padding-left:12px;border-left:2px solid rgba(15,92,53,.35);">Processo de decisão</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--blue-xl);border:1.5px solid var(--blue-lt);padding:24px;position:relative;">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--blue);"></div>
+      <div style="font-size:21px;font-weight:600;color:var(--navy);line-height:1.55;">
+        Convicção calibra a direção. Processo calibra o tamanho. São decisões independentes. A segunda importa mais do que a primeira.
+      </div>
+    </div>
+
+    <div class="snum">07 / 08</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ─── S8 CLOSE ─── -->
+  <div class="slide" id="s8" style="background:var(--navy);padding:0;justify-content:flex-end;">
+    <!-- Shape grande azul -->
+    <div style="position:absolute;top:0;left:0;right:0;height:380px;background:var(--blue);z-index:0;clip-path:polygon(0 0, 100% 0, 100% 80%, 0 100%);"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:8px;background:var(--blue-lt);z-index:1;"></div>
+
+    <div style="position:relative;z-index:2;padding:0 60px 72px;">
+      <div style="padding:60px 0 48px;">
+        <div class="label inv" style="margin-bottom:28px;">Para encerrar</div>
+        <div style="font-size:80px;font-weight:900;line-height:.98;letter-spacing:-.04em;color:#fff;">
+          Meça o<br>que não<br>controla.
+        </div>
+        <div style="font-size:80px;font-weight:900;line-height:.98;letter-spacing:-.04em;color:var(--blue-lt);margin-bottom:24px;">
+          Gerencie<br>o resto.
+        </div>
+        <div style="width:60px;height:4px;background:rgba(255,255,255,.25);margin-bottom:24px;"></div>
+        <div style="font-size:21px;font-weight:400;line-height:1.65;color:rgba(255,255,255,.45);max-width:580px;">
+          O risco exógeno se incorpora no tamanho da posição. O endógeno se gerencia com processo. Confundir os dois é onde a maioria perde. Não na previsão.
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="padding:20px 22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-left:4px solid var(--red);">
+          <div style="font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;">Aceite o exógeno</div>
+          <div style="font-size:17px;font-weight:400;color:rgba(255,255,255,.65);line-height:1.5;">Volatilidade, macro, geopolítica. Calibre o tamanho da posição em função deles.</div>
+        </div>
+        <div style="padding:20px 22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-left:4px solid var(--blue-lt);">
+          <div style="font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;">Aja no endógeno</div>
+          <div style="font-size:17px;font-weight:400;color:rgba(255,255,255,.65);line-height:1.5;">Sizing, hedge, limite de perda. São as alavancas reais. É aqui que o profissional gasta energia.</div>
+        </div>
+        <div style="padding:20px 22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-left:4px solid rgba(255,255,255,.2);">
+          <div style="font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;">Processo acima de convicção</div>
+          <div style="font-size:17px;font-weight:400;color:rgba(255,255,255,.65);line-height:1.5;">Convicção é sobre direção. Processo determina o tamanho. Decisões independentes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum snum-inv">08 / 08</div>
+    <div class="sfoot sfoot-inv" style="z-index:3;"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:12.5%"></div></div>
+
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 8</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+  const slides  = document.querySelectorAll('.slide');
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+    counter.textContent = (cur + 1) + ' / ' + N;
+    fill.style.width    = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled    = cur === 0;
+    btnNext.disabled    = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

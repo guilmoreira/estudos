@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geopolítica & Mercados — LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #ffffff;
+    --surface: #f8fafc;
+    --border:  rgba(0,0,0,0.08);
+    --accent1: #1a56db;
+    --accent2: #b45309;
+    --accent3: #5b21b6;
+    --text:    #111827;
+    --muted:   #9ca3af;
+    --danger:  #dc2626;
+    --success: #047857;
+    --ink:     #0f172a;
+    --w: 900px;
+    --h: 506px;
+  }
+
+  body {
+    background: #dde1e7;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    padding: 16px 24px; gap: 12px;
+  }
+
+  /* ─── Stage ─────────────────────────────────────── */
+  #stage {
+    position: relative;
+    width: var(--w); height: var(--h);
+    overflow: hidden; border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.06);
+  }
+
+  /* ─── Slides ─────────────────────────────────────── */
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 40px 56px 60px;
+    opacity: 0; pointer-events: none;
+    transform: translateX(40px);
+    transition: opacity .45s ease, transform .45s ease;
+    overflow: hidden; background: #ffffff;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+  .slide.exit   { opacity: 0; transform: translateX(-40px); }
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ─── Tag ────────────────────────────────────────── */
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; padding: 5px 12px; border-radius: 100px;
+    width: fit-content; margin-bottom: 20px;
+  }
+  .tag-cyan   { background: rgba(26,86,219,.08);  color: var(--accent1); border: 1px solid rgba(26,86,219,.2); }
+  .tag-amber  { background: rgba(180,83,9,.08);   color: var(--accent2); border: 1px solid rgba(180,83,9,.2); }
+  .tag-red    { background: rgba(220,38,38,.08);  color: var(--danger);  border: 1px solid rgba(220,38,38,.2); }
+  .tag-green  { background: rgba(4,120,87,.08);   color: var(--success); border: 1px solid rgba(4,120,87,.2); }
+  .tag-violet { background: rgba(91,33,182,.08);  color: var(--accent3); border: 1px solid rgba(91,33,182,.2); }
+  .tag-dark   { background: rgba(15,23,42,.08);   color: var(--ink);     border: 1px solid rgba(15,23,42,.18); }
+
+  /* ─── Typography ─────────────────────────────────── */
+  .display {
+    font-family: 'DM Serif Display', serif;
+    font-size: 46px; line-height: 1.08; letter-spacing: -.02em; margin-bottom: 16px;
+  }
+  .display em { font-style: italic; color: var(--danger); }
+
+  .h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px; line-height: 1.2; letter-spacing: -.01em; margin-bottom: 22px;
+  }
+  .h2 em { font-style: italic; color: var(--accent2); }
+  .h2 span.hi { color: var(--accent1); }
+  .h2 span.red { color: var(--danger); }
+
+  .lead {
+    font-size: 15px; line-height: 1.65;
+    color: rgba(17,24,39,.6); max-width: 640px; margin-bottom: 20px;
+  }
+
+  /* ─── Layout helpers ─────────────────────────────── */
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ─── Banner line ────────────────────────────────── */
+  .banner-line {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; border-radius: 3px 3px 0 0;
+  }
+
+  /* ─── Decorative ─────────────────────────────────── */
+  .deco-circle {
+    position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+  }
+
+  /* ─── Slide num / footer ─────────────────────────── */
+  .slide-num {
+    position: absolute; bottom: 22px; right: 32px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(17,24,39,.2); letter-spacing: .05em; z-index: 10;
+  }
+  .slide-num.light { color: rgba(255,255,255,.25); }
+
+  .slide-footer {
+    position: absolute; bottom: 22px; left: 32px;
+    display: flex; align-items: center; gap: 6px; z-index: 10;
+    text-decoration: none; background: rgba(255,255,255,.85);
+    backdrop-filter: blur(4px); padding: 2px 6px; border-radius: 6px;
+  }
+  .slide-footer.light { background: rgba(255,255,255,.15); }
+  .slide-footer svg { width: 14px; height: 14px; opacity: .35; }
+  .slide-footer span { font-size: 10px; font-weight: 500; letter-spacing: .04em; color: rgba(17,24,39,.3); }
+  .slide-footer.light span { color: rgba(255,255,255,.5); }
+
+  /* ─── Cards ──────────────────────────────────────── */
+  .card {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;
+  }
+  .card-title {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .card-value { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.2; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* ─── List ───────────────────────────────────────── */
+  .list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13.5px; line-height: 1.5; color: rgba(17,24,39,.75);
+  }
+  .list li .dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .list li strong { color: var(--text); font-weight: 600; }
+
+  /* ─── Info boxes ─────────────────────────────────── */
+  .info-box { border-radius: 10px; padding: 13px 16px; font-size: 12.5px; line-height: 1.55; }
+  .info-box.cyan   { background: rgba(26,86,219,.05);  border: 1px solid rgba(26,86,219,.18); }
+  .info-box.amber  { background: rgba(180,83,9,.05);   border: 1px solid rgba(180,83,9,.18); }
+  .info-box.red    { background: rgba(220,38,38,.05);  border: 1px solid rgba(220,38,38,.18); }
+  .info-box.green  { background: rgba(4,120,87,.05);   border: 1px solid rgba(4,120,87,.18); }
+  .info-box.dark   { background: rgba(15,23,42,.04);   border: 1px solid rgba(15,23,42,.12); }
+
+  /* ─── Risk bars ──────────────────────────────────── */
+  .risk-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 11px; }
+  .risk-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .risk-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .risk-detail { font-size: 10.5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .risk-bar { height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .risk-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+  /* ─── Big stat ───────────────────────────────────── */
+  .stat-block { display: flex; flex-direction: column; gap: 3px; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 64px; line-height: 1; letter-spacing: -.04em;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); letter-spacing: .04em; line-height: 1.45; }
+
+  /* ─── Chokepoint type cards ──────────────────────── */
+  .type-card {
+    border-radius: 12px; padding: 16px 18px;
+    display: flex; align-items: flex-start; gap: 14px;
+    border: 1px solid #e2e8f0;
+  }
+  .tc-icon { font-size: 26px; flex-shrink: 0; }
+  .tc-body { display: flex; flex-direction: column; gap: 3px; }
+  .tc-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .tc-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+
+  /* ─── Leg boxes ──────────────────────────────────── */
+  .leg-box { border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .leg-cyan  { background: rgba(26,86,219,.05);  border: 1px solid rgba(26,86,219,.2); }
+  .leg-amber { background: rgba(180,83,9,.05);   border: 1px solid rgba(180,83,9,.2); }
+  .leg-red   { background: rgba(220,38,38,.05);  border: 1px solid rgba(220,38,38,.2); }
+  .leg-green { background: rgba(4,120,87,.05);   border: 1px solid rgba(4,120,87,.2); }
+  .leg-dark  { background: rgba(15,23,42,.04);   border: 1px solid rgba(15,23,42,.12); }
+  .leg-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .leg-value { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.2; }
+  .leg-desc  { font-size: 11.5px; color: #6b7280; line-height: 1.5; }
+
+  /* ─── Formula / mono block ───────────────────────── */
+  .mono-block {
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-left: 3px solid var(--accent1); border-radius: 0 8px 8px 0;
+    padding: 12px 18px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.75; color: var(--accent1);
+  }
+  .mono-block .cm { color: #9ca3af; }
+
+  /* ─── Signal tag ─────────────────────────────────── */
+  .sig { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+  .sig-red    { background: rgba(220,38,38,.1);  color: var(--danger); }
+  .sig-amber  { background: rgba(180,83,9,.1);   color: var(--accent2); }
+  .sig-green  { background: rgba(4,120,87,.1);   color: var(--success); }
+  .sig-blue   { background: rgba(26,86,219,.1);  color: var(--accent1); }
+
+  /* ─── Market row ─────────────────────────────────── */
+  .mkt-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 14px; border-bottom: 1px solid #f1f5f9; font-size: 12.5px;
+  }
+  .mkt-row:last-child { border-bottom: none; }
+  .mkt-asset { display: flex; align-items: center; gap: 8px; }
+  .mkt-ticker { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 12px; color: var(--text); }
+  .mkt-name { color: var(--muted); font-size: 11px; }
+  .mkt-impact { font-size: 11px; color: var(--muted); text-align: right; max-width: 200px; }
+
+  /* ─── Controls ───────────────────────────────────── */
+  #controls { display: flex; align-items: center; gap: 16px; }
+
+  #btn-print {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 8px;
+    background: rgba(26,86,219,.09); border: 1px solid rgba(26,86,219,.22);
+    color: var(--accent1); font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s;
+  }
+  #btn-print:hover { background: rgba(26,86,219,.16); }
+
+  .btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,.8); border: 1px solid rgba(0,0,0,.1);
+    color: #374151; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; user-select: none;
+  }
+  .btn:disabled { opacity: .3; cursor: default; }
+
+  #slide-counter {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: #6b7280; min-width: 60px; text-align: center;
+  }
+
+  .progress-track { display: flex; gap: 6px; }
+  .pip { width: 24px; height: 3px; border-radius: 2px; background: rgba(0,0,0,.15); cursor: pointer; transition: background .3s; }
+  .pip.on { background: var(--accent1); }
+
+  /* ─── Print ──────────────────────────────────────── */
+  @media print {
+    @page { size: 900px 506px; margin: 0; }
+    body { background: #dde1e7 !important; padding: 0; gap: 0; display: block; min-height: unset; }
+    #controls, #btn-print { display: none !important; }
+    #stage { position: static !important; width: 900px !important; height: 506px !important; overflow: visible !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+    .slide { position: relative !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; display: flex !important; width: 900px !important; height: 506px !important; page-break-after: always; break-after: page; overflow: hidden !important; }
+    .slide.exit { display: none !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+
+  /* ─── Dark slide ─────────────────────────────────── */
+  .slide-dark {
+    background: var(--ink) !important;
+    color: rgba(255,255,255,.9);
+  }
+  .slide-dark .display { color: #ffffff; }
+  .slide-dark .lead { color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 1 — Capa
+  ════════════════════════════════════════════════════ -->
+  <div class="slide active slide-dark" id="s1">
+    <!-- subtle grid -->
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;z-index:0;"></div>
+    <!-- glow -->
+    <div style="position:absolute;width:480px;height:480px;right:-80px;top:-120px;background:radial-gradient(circle,rgba(220,38,38,.12) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+
+    <div class="tag tag-dark" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.15);">Geopolítica & Mercados</div>
+    <div class="display" style="color:#fff;font-size:44px;">
+      Os Pontos de<br><em>Estrangulamento</em><br>da Economia Global
+    </div>
+    <p class="lead" style="color:rgba(255,255,255,.5);max-width:520px;">Onde o comércio mundial pode parar — e o que isso significa para o seu portfólio.</p>
+
+    <div style="display:flex;gap:14px;margin-top:4px;">
+      <div style="padding:8px 16px;border:1px solid rgba(255,255,255,.12);border-radius:8px;font-size:12px;color:rgba(255,255,255,.5);">
+        <span style="color:#fff;font-weight:700;">30+</span> pontos mapeados
+      </div>
+      <div style="padding:8px 16px;border:1px solid rgba(220,38,38,.3);border-radius:8px;font-size:12px;color:rgba(220,38,38,.8);background:rgba(220,38,38,.08);">
+        <span style="color:#f87171;font-weight:700;">13</span> críticos
+      </div>
+      <div style="padding:8px 16px;border:1px solid rgba(255,255,255,.1);border-radius:8px;font-size:12px;color:rgba(255,255,255,.45);">
+        <span style="color:#fff;font-weight:700;">US$ 25 tri</span> em risco
+      </div>
+    </div>
+
+    <div class="slide-num light">01 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 2 — O que é um chokepoint?
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="banner-line" style="background:var(--accent1)"></div>
+    <div class="tag tag-cyan">Definição</div>
+    <div class="h2">O que é um ponto de<br><em>estrangulamento</em> global?</div>
+
+    <p class="lead" style="margin-bottom:16px;">Um único ponto geográfico, tecnológico ou de recurso que — se interrompido — paralisa cadeias de suprimento inteiras. Não são vulnerabilidades teóricas: todas já foram testadas pela história.</p>
+
+    <div class="cols-2" style="gap:12px;">
+      <div class="type-card">
+        <div class="tc-icon">🚢</div>
+        <div class="tc-body">
+          <div class="tc-name">Marítimo</div>
+          <div class="tc-desc">Estreitos e canais onde mais de 80% do comércio global passa. Sem alternativa rápida.</div>
+        </div>
+      </div>
+      <div class="type-card">
+        <div class="tc-icon">💻</div>
+        <div class="tc-body">
+          <div class="tc-name">Tecnológico</div>
+          <div class="tc-desc">Fábricas únicas de chips e máquinas sem as quais nenhuma indústria moderna funciona.</div>
+        </div>
+      </div>
+      <div class="type-card">
+        <div class="tc-icon">⛽</div>
+        <div class="tc-body">
+          <div class="tc-name">Energético</div>
+          <div class="tc-desc">Campos de petróleo e gás, terminais de GNL e dutos que determinam a inflação global.</div>
+        </div>
+      </div>
+      <div class="type-card">
+        <div class="tc-icon">🌱</div>
+        <div class="tc-body">
+          <div class="tc-name">Alimentar e Mineral</div>
+          <div class="tc-desc">Reservas de trigo, lítio, cobalto e terras raras — concentradas em poucos países.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 3 — Top 5 ranking
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="banner-line" style="background:linear-gradient(90deg,var(--danger),var(--accent2))"></div>
+    <div class="tag tag-red">Ranking 2026</div>
+    <div class="h2" style="margin-bottom:18px;">Os <span class="red">5 pontos</span> de maior risco global</div>
+
+    <div style="display:flex;flex-direction:column;gap:0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+
+      <div style="display:grid;grid-template-columns:28px 220px 1fr 64px;align-items:center;gap:14px;padding:12px 18px;background:#fafafa;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:15px;font-weight:800;color:var(--danger);font-family:'DM Serif Display',serif;">1</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">🇳🇱 ASML — Eindhoven</div>
+          <div style="font-size:11px;color:var(--muted);">Única fábrica de máquinas EUV do mundo</div>
+        </div>
+        <div style="height:5px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:95%;background:var(--danger);border-radius:4px;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--danger);text-align:right;">95%</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:28px 220px 1fr 64px;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:15px;font-weight:800;color:var(--danger);font-family:'DM Serif Display',serif;">2</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">🇹🇼 TSMC — Taiwan</div>
+          <div style="font-size:11px;color:var(--muted);">90% dos chips avançados do planeta</div>
+        </div>
+        <div style="height:5px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:90%;background:var(--danger);border-radius:4px;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--danger);text-align:right;">90%</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:28px 220px 1fr 64px;align-items:center;gap:14px;padding:12px 18px;background:#fafafa;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:15px;font-weight:800;color:rgba(220,38,38,.8);font-family:'DM Serif Display',serif;">3</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">🌊 Mar do Sul da China</div>
+          <div style="font-size:11px;color:var(--muted);">US$ 3,5 tri/ano · 6 países em disputa</div>
+        </div>
+        <div style="height:5px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:88%;background:rgba(220,38,38,.75);border-radius:4px;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:rgba(220,38,38,.8);text-align:right;">88%</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:28px 220px 1fr 64px;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:15px;font-weight:800;color:var(--accent2);font-family:'DM Serif Display',serif;">4</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">🛢 Estreito de Ormuz</div>
+          <div style="font-size:11px;color:var(--muted);">20% do petróleo mundial em 33 km</div>
+        </div>
+        <div style="height:5px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:85%;background:var(--accent2);border-radius:4px;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);text-align:right;">85%</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:28px 220px 1fr 64px;align-items:center;gap:14px;padding:12px 18px;">
+        <div style="font-size:15px;font-weight:800;color:var(--accent2);font-family:'DM Serif Display',serif;">5</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">🌾 Mar Negro — Ucrânia</div>
+          <div style="font-size:11px;color:var(--muted);">30% do trigo mundial · corredor sob tensão</div>
+        </div>
+        <div style="height:5px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:85%;background:var(--accent2);border-radius:4px;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);text-align:right;">85%</div>
+      </div>
+    </div>
+    <div class="slide-num">03 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 4 — O Paradoxo do Chip
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="banner-line" style="background:var(--accent3)"></div>
+    <div class="tag tag-violet">Tecnologia</div>
+    <div class="h2">O paradoxo que ninguém fala: <em>chips</em></div>
+
+    <div class="cols-2" style="gap:20px;align-items:stretch;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(91,33,182,.04);border:1px solid rgba(91,33,182,.18);border-radius:14px;padding:22px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;">TSMC · Taiwan</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:72px;line-height:1;letter-spacing:-.04em;color:var(--accent3);">90%</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:6px;line-height:1.5;">dos chips avançados do mundo<br>fabricados em <strong style="color:var(--text);">uma única ilha.</strong></div>
+        </div>
+        <div class="info-box dark" style="font-size:12px;">
+          <strong>Clientes:</strong> Apple, NVIDIA, AMD, Qualcomm, Intel. Se Taiwan for bloqueada — a produção global de tecnologia para por anos.
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(26,86,219,.04);border:1px solid rgba(26,86,219,.18);border-radius:14px;padding:22px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent1);margin-bottom:8px;">ASML · Eindhoven, Holanda</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:72px;line-height:1;letter-spacing:-.04em;color:var(--accent1);">100%</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:6px;line-height:1.5;">das máquinas de litografia EUV<br>vêm de <strong style="color:var(--text);">uma única empresa.</strong></div>
+        </div>
+        <div class="info-box cyan" style="font-size:12px;">
+          <strong style="color:var(--accent1);">Sem EUV:</strong> não se fabrica nenhum chip abaixo de 7nm. Sem chip moderno: sem iPhone, sem GPU, sem data center de IA.
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 5 — Rotas marítimas
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="banner-line" style="background:linear-gradient(90deg,#0ea5e9,var(--accent1))"></div>
+    <div class="tag tag-cyan">Rotas Marítimas</div>
+    <div class="h2">O comércio flui por <em>gargalos</em></div>
+
+    <div class="cols-3" style="gap:14px;">
+      <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;padding:14px 16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Estreito de Ormuz</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.1;">20%<br><span style="font-size:16px;color:rgba(255,255,255,.6);">do petróleo global</span></div>
+        </div>
+        <div style="padding:12px 16px;background:#f8fafc;">
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">33 km</strong> de largura · Irã e Omã nas margens · 17 milhões de barris/dia passam aqui.</div>
+          <div style="margin-top:8px;"><span class="sig sig-red">🛢 Petróleo</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;padding:14px 16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Estreito de Malaca</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.1;">25%<br><span style="font-size:16px;color:rgba(255,255,255,.6);">do comércio marítimo</span></div>
+        </div>
+        <div style="padding:12px 16px;background:#f8fafc;">
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">2,7 km</strong> de largura mínima · rota China–Índia–Europa · sem alternativa econômica.</div>
+          <div style="margin-top:8px;"><span class="sig sig-blue">📦 Supply chains</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div style="background:#0f172a;padding:14px 16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Mar do Sul da China</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.1;">$3,5 tri<br><span style="font-size:16px;color:rgba(255,255,255,.6);">por ano</span></div>
+        </div>
+        <div style="padding:12px 16px;background:#f8fafc;">
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">6 países</strong> em disputa territorial · China, Vietnam, Filipinas, Malásia, Brunei, Taiwan.</div>
+          <div style="margin-top:8px;"><span class="sig sig-red">⚔️ Tensão ativa</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box amber" style="margin-top:14px;">
+      <p style="font-size:12px;color:rgba(17,24,39,.78);">
+        <strong style="color:var(--accent2);">Regra do corredor único:</strong> se qualquer desses estreitos fechar por 30 dias, o mercado de commodities reenifica a cadeia de preços global — petróleo, gás, eletrônicos e alimentos sobem em cascata.
+      </p>
+    </div>
+    <div class="slide-num">05 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 6 — Segurança alimentar
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="banner-line" style="background:linear-gradient(90deg,#65a30d,var(--accent2))"></div>
+    <div class="tag tag-amber">Cadeia Alimentar</div>
+    <div class="h2">Trigo, corredor e <em>inflação global</em></div>
+
+    <div class="cols-2" style="gap:22px;align-items:start;">
+      <div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="background:#fafafa;border:1px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Ucrânia + Rússia</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent2);">30%</div>
+            <div style="font-size:11px;color:var(--muted);">do trigo global</div>
+          </div>
+          <div style="background:#fafafa;border:1px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Dependentes</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:36px;color:var(--danger);">36</div>
+            <div style="font-size:11px;color:var(--muted);">países &gt;50% do trigo daqui</div>
+          </div>
+        </div>
+
+        <div class="info-box red">
+          <strong style="color:var(--danger);">Março 2022:</strong> com o fechamento do corredor do Mar Negro, o índice global de alimentos da FAO atingiu o recorde histórico. Nordeste da África e Oriente Médio entraram em situação de crise alimentar em 90 dias.
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Outros pontos críticos alimentares</div>
+
+        <div class="risk-row" style="margin-bottom:8px;">
+          <div class="risk-header">
+            <span class="risk-name">🌽 Milho — EUA + Brasil</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">65% global</span>
+          </div>
+          <div class="risk-bar"><div class="risk-fill" style="width:65%;background:var(--accent2);"></div></div>
+        </div>
+
+        <div class="risk-row" style="margin-bottom:8px;">
+          <div class="risk-header">
+            <span class="risk-name">🌱 Soja — EUA + Brasil + ARG</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">80% global</span>
+          </div>
+          <div class="risk-bar"><div class="risk-fill" style="width:80%;background:var(--success);"></div></div>
+        </div>
+
+        <div class="risk-row" style="margin-bottom:0;">
+          <div class="risk-header">
+            <span class="risk-name">🍚 Arroz — Índia + Tailândia</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">55% global</span>
+          </div>
+          <div class="risk-bar"><div class="risk-fill" style="width:55%;background:var(--accent2);"></div></div>
+        </div>
+
+        <div class="info-box green" style="margin-top:2px;">
+          <strong style="color:var(--success);">Brasil como buffer:</strong> o Cerrado e Mato Grosso são a maior reserva agrícola expansível do mundo — e isso é um ativo estratégico crescente.
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">06 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 7 — Brasil no tabuleiro
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="banner-line" style="background:linear-gradient(90deg,#009C3B,#FFDF00,#009C3B)"></div>
+    <div class="tag tag-green">Brasil 🇧🇷</div>
+    <div class="h2">Três posições no <em>tabuleiro geopolítico</em></div>
+
+    <div class="cols-3" style="gap:14px;">
+      <div class="leg-box leg-green">
+        <div style="font-size:22px;margin-bottom:2px;">🌿</div>
+        <div class="leg-title" style="color:var(--success);">Fornecedor estratégico</div>
+        <div class="leg-value" style="font-size:16px;color:var(--success);">Maior exportador do mundo</div>
+        <div class="leg-desc">Soja, carne, açúcar, milho, café, celulose. O Cerrado como ativo geopolítico real — e crescente com a crise de segurança alimentar global.</div>
+        <div style="margin-top:6px;">
+          <span class="sig sig-green">↑ Alta demanda</span>
+        </div>
+      </div>
+
+      <div class="leg-box leg-amber">
+        <div style="font-size:22px;margin-bottom:2px;">⛽</div>
+        <div class="leg-title" style="color:var(--accent2);">Exposição via Ormuz</div>
+        <div class="leg-value" style="font-size:16px;color:var(--accent2);">Dependência de petróleo leve</div>
+        <div class="leg-desc">Tensão no Ormuz → preço do Brent → custo de importação → inflação doméstica → pressão no BRL e na Selic. Petrobras é termômetro direto.</div>
+        <div style="margin-top:6px;">
+          <span class="sig sig-amber">⚠ Monitorar PETR4</span>
+        </div>
+      </div>
+
+      <div class="leg-box leg-cyan">
+        <div style="font-size:22px;margin-bottom:2px;">🔋</div>
+        <div class="leg-title" style="color:var(--accent1);">Oportunidade emergente</div>
+        <div class="leg-value" style="font-size:16px;color:var(--accent1);">Lítio em Minas Gerais</div>
+        <div class="leg-desc">Brasil tem reservas relevantes de lítio, nióbio (100% do mercado global) e grafite. A corrida por minerais críticos da IA coloca o Brasil no centro da disputa.</div>
+        <div style="margin-top:6px;">
+          <span class="sig sig-blue">📈 Tese de longo prazo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box dark" style="margin-top:14px;">
+      <p style="font-size:12px;color:rgba(17,24,39,.78);">
+        <strong>Síntese:</strong> o Brasil é simultaneamente beneficiado pela instabilidade alimentar global, vulnerável à instabilidade energética via Ormuz, e posicionado para capturar valor na corrida por minerais críticos.
+      </p>
+    </div>
+    <div class="slide-num">07 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 8 — Impacto no portfólio
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="banner-line" style="background:var(--accent1)"></div>
+    <div class="tag tag-cyan">Impacto no Portfólio</div>
+    <div class="h2">Como <em>ler</em> geopolítica no seu portfólio</div>
+
+    <div class="cols-2" style="gap:20px;align-items:start;">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Ativos e sensibilidades</div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+          <div class="mkt-row" style="background:#fafafa;">
+            <div class="mkt-asset">
+              <span class="mkt-ticker">PETR4</span>
+              <span class="mkt-name">Petrobras</span>
+            </div>
+            <div class="mkt-impact">Ormuz fechado → Brent &gt; $120 → PETR4 ↑ curto prazo, mas inflação corrói fundamentos</div>
+          </div>
+          <div class="mkt-row">
+            <div class="mkt-asset">
+              <span class="mkt-ticker">VALE3</span>
+              <span class="mkt-name">Vale</span>
+            </div>
+            <div class="mkt-impact">Tensão no Mar do Sul da China → risco de demanda por minério de ferro da China ↓</div>
+          </div>
+          <div class="mkt-row" style="background:#fafafa;">
+            <div class="mkt-asset">
+              <span class="mkt-ticker">BRL/USD</span>
+              <span class="mkt-name">Câmbio</span>
+            </div>
+            <div class="mkt-impact">Aversão a risco global → fuga de EM → BRL depreciação rápida</div>
+          </div>
+          <div class="mkt-row">
+            <div class="mkt-asset">
+              <span class="mkt-ticker">NTN-B</span>
+              <span class="mkt-name">IPCA+</span>
+            </div>
+            <div class="mkt-impact">Chokepoints alimentares/energéticos → inflação → NTN-B precificada a mercado</div>
+          </div>
+          <div class="mkt-row" style="background:#fafafa;">
+            <div class="mkt-asset">
+              <span class="mkt-ticker">CDS 5Y</span>
+              <span class="mkt-name">Risco soberano</span>
+            </div>
+            <div class="mkt-impact">Crise global severa → flight to quality → spreads do Brasil sobem</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Framework de monitoramento</div>
+        <div class="mono-block">
+          Sinal geopolítico<br>
+          &nbsp;&nbsp;→ qual chokepoint é afetado?<br>
+          &nbsp;&nbsp;→ qual commodity ou supply chain?<br>
+          &nbsp;&nbsp;→ qual setor / empresa brasileira?<br>
+          &nbsp;&nbsp;→ <span class="cm">// curto prazo: volatilidade</span><br>
+          &nbsp;&nbsp;→ <span class="cm">// médio: repricing de ativos</span><br>
+          &nbsp;&nbsp;→ <span class="cm">// longo: mudança estrutural</span>
+        </div>
+        <div class="info-box cyan">
+          <strong style="color:var(--accent1);">Regra prática:</strong> chokepoints não criam tendência sozinhos — eles aceleram ou invertem tendências já existentes.
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 9 — Leituras recomendadas
+  ════════════════════════════════════════════════════ -->
+  <div class="slide" id="s9">
+    <div class="banner-line" style="background:var(--ink)"></div>
+    <div class="tag tag-dark">Aprofundamento</div>
+    <div class="h2" style="margin-bottom:18px;">Para ir <em>além</em> dos slides</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">Prisioneiros da Geografia</div>
+        <div style="font-size:10px;color:var(--muted);">Tim Marshall</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">Como rios, montanhas e oceanos determinam o destino das nações. O ponto de entrada ideal.</div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">Chip War</div>
+        <div style="font-size:10px;color:var(--muted);">Chris Miller</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">A guerra pelos semicondutores. TSMC, ASML, China e a batalha pelo recurso mais estratégico do século.</div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">O Fim do Mundo é Apenas o Começo</div>
+        <div style="font-size:10px;color:var(--muted);">Peter Zeihan</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">Desglobalização, cadeias regionais e por que o Brasil está melhor posicionado do que imagina.</div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">The New Map</div>
+        <div style="font-size:10px;color:var(--muted);">Daniel Yergin</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">Energia, geopolítica e a nova ordem global — do petróleo ao gás natural e às renováveis.</div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">Connectography</div>
+        <div style="font-size:10px;color:var(--muted);">Parag Khanna</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">Como redes de infraestrutura e logística estão redesenhando o mapa do poder global.</div>
+      </div>
+
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:18px;">📖</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.3;">Rotas da Seda</div>
+        <div style="font-size:10px;color:var(--muted);">Peter Frankopan</div>
+        <div style="font-size:11px;color:rgba(17,24,39,.65);line-height:1.45;margin-top:2px;">A história do mundo pela perspectiva das rotas comerciais — e por que o eixo está voltando ao Oriente.</div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 10</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 10 — Conclusão / CTA
+  ════════════════════════════════════════════════════ -->
+  <div class="slide slide-dark" id="s10">
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;z-index:0;"></div>
+    <div style="position:absolute;width:400px;height:400px;left:-80px;bottom:-80px;background:radial-gradient(circle,rgba(26,86,219,.15) 0%,transparent 70%);z-index:0;pointer-events:none;"></div>
+
+    <div class="tag tag-dark" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.15);">Conclusão</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.2;color:#fff;letter-spacing:-.015em;margin-bottom:20px;">
+      "Entender o tabuleiro é o<br><em style="color:#93c5fd;">primeiro passo.</em>"
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px;">Mapa interativo</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8);font-weight:600;">guilmoreira.github.io/geopolitic</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;">30+ chokepoints com histórico, impacto e análise em tempo real</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="padding:4px 12px;border:1px solid rgba(255,255,255,.15);border-radius:100px;font-size:11px;color:rgba(255,255,255,.45);">#geopolítica</span>
+      <span style="padding:4px 12px;border:1px solid rgba(255,255,255,.15);border-radius:100px;font-size:11px;color:rgba(255,255,255,.45);">#mercadofinanceiro</span>
+      <span style="padding:4px 12px;border:1px solid rgba(255,255,255,.15);border-radius:100px;font-size:11px;color:rgba(255,255,255,.45);">#supplychain</span>
+      <span style="padding:4px 12px;border:1px solid rgba(255,255,255,.15);border-radius:100px;font-size:11px;color:rgba(255,255,255,.45);">#brasil</span>
+      <span style="padding:4px 12px;border:1px solid rgba(255,255,255,.15);border-radius:100px;font-size:11px;color:rgba(255,255,255,.45);">#commodities</span>
+    </div>
+
+    <div class="slide-num light">10 / 10</div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- ── Controls ───────────────────────────────────── -->
+<div id="controls">
+  <button class="btn" id="prev" disabled>‹</button>
+  <div class="progress-track" id="pips"></div>
+  <div id="slide-counter">01 / 10</div>
+  <button class="btn" id="next">›</button>
+  <button id="btn-print">⬡ Exportar PDF</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const pipsEl = document.getElementById('pips');
+  const counter = document.getElementById('slide-counter');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const total   = slides.length;
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const p = document.createElement('div');
+    p.className = 'pip' + (i === 0 ? ' on' : '');
+    p.addEventListener('click', () => goTo(i));
+    pipsEl.appendChild(p);
+  });
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    setTimeout(() => slides[cur].classList.remove('exit'), 450);
+    cur = idx;
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.pip').forEach((p, i) => p.classList.toggle('on', i === cur));
+    counter.textContent = String(cur + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === total - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(cur - 1));
+  nextBtn.addEventListener('click', () => goTo(cur + 1));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(cur - 1);
+  });
+
+  let tx = 0;
+  document.getElementById('stage').addEventListener('touchstart', e => tx = e.touches[0].clientX);
+  document.getElementById('stage').addEventListener('touchend',   e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) goTo(dx > 0 ? cur + 1 : cur - 1);
+  });
+
+  // LinkedIn footer
+  const liFooter = `
+    <a class="slide-footer" href="https://www.linkedin.com/in/guilmoreira/" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="24" height="24" rx="4" fill="white" fill-opacity="0.9"/>
+        <path d="M7.2 9.6H4.8V19.2H7.2V9.6Z" fill="#0A66C2"/>
+        <circle cx="6" cy="6.6" r="1.4" fill="#0A66C2"/>
+        <path d="M19.2 13.8C19.2 11.4 17.7 9.4 15.4 9.4C14.2 9.4 13.2 9.9 12.5 10.8V9.6H10.1V19.2H12.5V14.4C12.5 13.1 13.3 12.1 14.5 12.1C15.7 12.1 16.4 12.9 16.4 14.2V19.2H19.2V13.8Z" fill="#0A66C2"/>
+      </svg>
+      <span>linkedin.com/in/guilmoreira</span>
+    </a>`;
+
+  document.querySelectorAll('.slide').forEach(s => {
+    const f = document.createElement('div');
+    f.innerHTML = liFooter;
+    const a = f.firstElementChild;
+    if (s.classList.contains('slide-dark')) a.classList.add('light');
+    s.appendChild(a);
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

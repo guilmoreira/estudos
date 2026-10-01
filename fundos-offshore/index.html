@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fundos Offshore e suas estruturas · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent1: #C4192C;
+    --accent2: #8B6914;
+    --accent3: #1A3A6B;
+    --text:    #0D0D0D;
+    --muted:   #888880;
+    --danger:  #C4192C;
+    --success: #1A6B3C;
+    --border:  #D4D0C8;
+    --bg:      #FDFAF5;
+    --w: 900px;
+    --h: 506px;
+  }
+
+  body {
+    background: #1C1C1C;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    padding: 24px;
+    gap: 20px;
+  }
+
+  /* ─── Stage ──────────────────────────────────────── */
+  #stage {
+    position: relative;
+    width: var(--w);
+    height: var(--h);
+    overflow: hidden;
+    border-radius: 2px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  /* ─── Slides ─────────────────────────────────────── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    padding: 40px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(40px);
+    transition: opacity .42s ease, transform .42s ease;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+  .slide.exit   { opacity: 0; transform: translateX(-40px); }
+  .slide > *    { position: relative; z-index: 1; }
+
+  .slide-dark { background: #0F0F0F !important; color: #EDE9E0; }
+
+  /* ─── Decorative circles ─────────────────────────── */
+  .deco { position: absolute; border-radius: 50%; z-index: 0; }
+
+  /* ─── Banner line ────────────────────────────────── */
+  .bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent1) !important; border-radius: 0; }
+
+  /* ─── Tag ────────────────────────────────────────── */
+  .tag {
+    display: inline-flex; align-items: center;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+    padding: 0 0 3px 0; border-radius: 0;
+    border: none; border-bottom: 1.5px solid currentColor;
+    background: none;
+    width: fit-content; margin-bottom: 16px;
+  }
+  .t-navy   { color: var(--accent3); }
+  .t-amber  { color: var(--accent2); }
+  .t-violet { color: var(--text); }
+  .t-green  { color: var(--success); }
+  .t-red    { color: var(--danger); }
+  .t-dark   { color: rgba(237,233,224,.45); border-bottom-color: rgba(237,233,224,.25); }
+
+  /* ─── Typography ─────────────────────────────────── */
+  .display {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 46px; line-height: 1.06;
+    letter-spacing: -.01em; margin-bottom: 14px;
+    font-weight: 700;
+  }
+  .display em { font-style: italic; color: var(--accent1); }
+  .display .g { color: var(--success); }
+
+  .h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 30px; line-height: 1.12;
+    letter-spacing: -.01em; margin-bottom: 20px;
+    font-weight: 700;
+  }
+  .h2 em   { font-style: italic; color: var(--accent1); }
+  .h2 .n   { color: var(--accent3); }
+  .h2 .g   { color: var(--success); }
+  .h2 .r   { color: var(--danger); }
+
+  .lead {
+    font-size: 14.5px; line-height: 1.65;
+    color: rgba(13,13,13,.58); max-width: 620px; margin-bottom: 18px;
+  }
+
+  /* ─── Grids ──────────────────────────────────────── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 11px; }
+
+  /* ─── Card ───────────────────────────────────────── */
+  .card {
+    background: #fff; border: 1px solid var(--border);
+    border-top: 2px solid var(--text);
+    border-radius: 0; padding: 13px 15px;
+  }
+  .card .ct { font-size: 9.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .card .cv { font-family: 'Playfair Display', Georgia, serif; font-size: 19px; line-height: 1.2; }
+  .card .cs { font-size: 11.5px; color: #5C5A54; margin-top: 4px; line-height: 1.45; }
+
+  /* ─── Info box ───────────────────────────────────── */
+  .box { border-radius: 0; padding: 10px 13px 10px 14px; font-size: 12.5px; line-height: 1.55;
+         border: none; border-left: 3px solid; }
+  .box.n  { border-color: var(--accent3); background: rgba(26,58,107,.04); }
+  .box.a  { border-color: var(--accent2); background: rgba(139,105,20,.04); }
+  .box.v  { border-color: var(--text);    background: rgba(0,0,0,.03); }
+  .box.g  { border-color: var(--success); background: rgba(26,107,60,.04); }
+  .box.r  { border-color: var(--danger);  background: rgba(196,25,44,.04); }
+  .box.gr { border-color: var(--border);  background: rgba(0,0,0,.02); }
+
+  /* dark boxes */
+  .dbox { border-radius: 0; padding: 11px 14px 11px 14px; font-size: 12px; line-height: 1.55;
+          border: none; border-left: 2px solid; }
+  .dbox.b { border-color: rgba(200,215,240,.35); background: rgba(200,215,240,.05); color: rgba(237,233,224,.78); }
+  .dbox.g { border-color: rgba(80,180,130,.35);  background: rgba(80,180,130,.05);  color: rgba(237,233,224,.78); }
+  .dbox.a { border-color: rgba(212,170,50,.4);   background: rgba(212,170,50,.06);  color: rgba(237,233,224,.78); }
+  .dbox.r { border-color: rgba(196,25,44,.4);    background: rgba(196,25,44,.06);   color: rgba(237,233,224,.78); }
+
+  /* ─── List ───────────────────────────────────────── */
+  .lst { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .lst li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: rgba(13,13,13,.72); }
+  .lst li .d { width: 4px; height: 4px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+  .lst li strong { color: var(--text); font-weight: 600; }
+
+  /* ─── Player row ─────────────────────────────────── */
+  .pr { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid #ECEAE3; }
+  .pr:last-child { border-bottom: none; }
+  .pi { width: 30px; height: 30px; border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; letter-spacing: .04em; color: var(--muted); flex-shrink: 0; background: rgba(0,0,0,.05) !important; }
+  .pn { font-size: 12.5px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .pd { font-size: 11px; color: #6B6860; line-height: 1.4; margin-top: 2px; }
+
+  /* ─── Jurisdiction card ──────────────────────────── */
+  .jc { border-radius: 0; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 1px solid; border-top: 2px solid; }
+  .jc .jf { font-size: 22px; margin-bottom: 3px; }
+  .jc .jn { font-family: 'Playfair Display', Georgia, serif; font-size: 15px; line-height: 1.2; font-weight: 700; }
+  .jc .js { font-size: 11px; color: #6B6860; line-height: 1.4; margin-top: 2px; }
+  .jc .jp { display:inline-flex; font-size:8.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:2px 6px; border-radius:0; width:fit-content; margin-top:3px; }
+  .jc-n { background: rgba(26,58,107,.05);  border-color: rgba(26,58,107,.2); border-top-color: var(--accent3); }
+  .jc-a { background: rgba(139,105,20,.05); border-color: rgba(139,105,20,.2); border-top-color: var(--accent2); }
+  .jc-v { background: rgba(13,13,13,.03);   border-color: rgba(13,13,13,.15); border-top-color: var(--text); }
+  .jc-g { background: rgba(26,107,60,.05);  border-color: rgba(26,107,60,.2);  border-top-color: var(--success); }
+
+  /* ─── Cost row ───────────────────────────────────── */
+  .cr { display:flex; justify-content:space-between; align-items:baseline; padding:7px 0; border-bottom:1px solid #ECEAE3; }
+  .cr:last-child { border-bottom:none; }
+  .cr .cn { font-size:12.5px; color:rgba(13,13,13,.72); }
+  .cr .cv { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent2); font-weight:600; }
+
+  /* ─── Risk badge ─────────────────────────────────── */
+  .rb { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:0; border:none; border-left:3px solid; }
+  .rb .ri { font-size:17px; flex-shrink:0; margin-top:1px; }
+  .rb .rt { font-size:12px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .rb .rd { font-size:11px; color:#6B6860; line-height:1.4; }
+
+  /* ─── Flow block ─────────────────────────────────── */
+  .fblock { border-radius: 0; padding: 9px 12px; font-size: 12px; }
+
+  /* ─── Slide number & footer ──────────────────────── */
+  .snum { position:absolute; bottom:18px; right:26px; font-family:'JetBrains Mono',monospace; font-size:10px; color:rgba(13,13,13,.18); letter-spacing:.05em; }
+  .snum-d { color:rgba(237,233,224,.2) !important; }
+  .sfoot { position:absolute; bottom:15px; left:26px; display:flex; align-items:center; gap:5px; z-index:10; }
+  .sfoot span { font-size:9.5px; font-weight:500; letter-spacing:.04em; color:rgba(13,13,13,.28); }
+  .sfoot-d span { color:rgba(237,233,224,.25) !important; }
+
+  /* ─── Progress bar ───────────────────────────────── */
+  #progress-bar {
+    width: var(--w);
+    height: 2px;
+    background: rgba(255,255,255,.06);
+    border-radius: 0;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%;
+    background: var(--accent1);
+    border-radius: 0;
+    transition: width .42s ease;
+  }
+
+  /* ─── Controls ───────────────────────────────────── */
+  #controls { display:flex; align-items:center; gap:14px; }
+
+  .btn {
+    width: 38px; height: 38px; border-radius: 2px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14);
+    color: #C8C4BC; font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s; user-select: none;
+  }
+  .btn:hover   { background: rgba(255,255,255,.14); }
+  .btn:disabled { opacity: .25; cursor: default; }
+
+  #counter { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#555550; min-width:48px; text-align:center; }
+
+  #btn-print {
+    display:flex; align-items:center; gap:6px;
+    padding:7px 14px; border-radius:2px;
+    background: rgba(196,25,44,.12);
+    border: 1px solid rgba(196,25,44,.28);
+    color: #D4707A;
+    font-family:'Inter',sans-serif;
+    font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; cursor:pointer;
+    transition:background .2s;
+  }
+  #btn-print:hover { background: rgba(196,25,44,.22); }
+
+  /* ─── Print ──────────────────────────────────────── */
+  @media print {
+    @page { size: 900px 506px; margin: 0; }
+    body { background: #1C1C1C !important; padding: 0; gap: 0; display: block; min-height: unset; }
+    #controls, #progress-bar { display: none !important; }
+    #stage { position:static !important; width:900px !important; height:506px !important; overflow:visible !important; border-radius:0 !important; box-shadow:none !important; display:block !important; }
+    .slide { position:relative !important; opacity:1 !important; transform:none !important; pointer-events:auto !important; display:flex !important; width:900px !important; height:506px !important; page-break-after:always; break-after:page; overflow:hidden !important; }
+    .slide.exit { display:none !important; }
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ══ 01 COVER ═════════════════════════════════════ -->
+  <div class="slide active" id="s1">
+    <div class="bar"></div>
+
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+
+      <!-- LEFT: title + lead -->
+      <div style="width:310px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding-right:28px;">
+        <div class="display" style="font-size:38px;line-height:1.06;">
+          Fundos <em>Offshore</em><br>
+          e suas estruturas
+        </div>
+        <p class="lead" style="font-size:13px;margin-bottom:0;">
+          Jurisdições, estrutura, players, compliance, tributação e
+          <strong>o que os gestores raramente contam</strong>.
+        </p>
+      </div>
+
+      <!-- DIVIDER -->
+      <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
+
+      <!-- RIGHT: draft flowchart -->
+      <div style="flex:1;padding-left:28px;display:flex;flex-direction:column;justify-content:center;">
+
+        <div style="font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:13px;font-family:'Inter',sans-serif;">Visão geral da estrutura</div>
+
+        <!-- Node: Cotista BR -->
+        <div style="display:inline-flex;align-items:center;padding:5px 10px;border:1px solid rgba(196,25,44,.3);background:rgba(196,25,44,.04);font-size:11px;font-weight:600;color:var(--danger);width:162px;font-family:'Inter',sans-serif;letter-spacing:.01em;">Cotista BR</div>
+
+        <div style="padding:2px 0 2px 13px;font-size:7.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em;">↓ subscrição BRL</div>
+
+        <!-- Node: Fundo Local -->
+        <div style="display:inline-flex;align-items:center;padding:5px 10px;border:1px solid rgba(26,107,60,.28);background:rgba(26,107,60,.04);font-size:11px;font-weight:600;color:var(--success);width:162px;font-family:'Inter',sans-serif;letter-spacing:.01em;">Fundo Local · FIE</div>
+
+        <div style="padding:2px 0 2px 13px;font-size:7.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em;">↓ remessa USD · Bacen</div>
+
+        <!-- Node: Feeder Cayman -->
+        <div style="display:inline-flex;align-items:center;padding:5px 10px;border:1px solid rgba(26,58,107,.28);background:rgba(26,58,107,.04);font-size:11px;font-weight:600;color:var(--accent3);width:162px;font-family:'Inter',sans-serif;letter-spacing:.01em;">Feeder Cayman</div>
+
+        <div style="padding:2px 0 2px 13px;font-size:7.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em;">↓ alocação</div>
+
+        <!-- Node: Master Fund + side players -->
+        <div style="display:flex;align-items:flex-start;">
+          <div style="display:inline-flex;align-items:center;padding:5px 10px;border:1.5px solid var(--text);background:#fff;font-size:11px;font-weight:700;color:var(--text);width:162px;font-family:'Inter',sans-serif;letter-spacing:.01em;flex-shrink:0;">Master Fund</div>
+          <div style="width:18px;height:1px;background:var(--border);margin-top:13px;flex-shrink:0;"></div>
+          <div style="border-left:1px solid var(--border);padding-left:10px;display:flex;flex-direction:column;gap:5px;padding-top:2px;">
+            <div style="font-size:9px;font-family:'Inter',sans-serif;color:var(--muted);font-weight:500;white-space:nowrap;">Investment Manager</div>
+            <div style="font-size:9px;font-family:'Inter',sans-serif;color:var(--muted);font-weight:500;white-space:nowrap;">Administrator</div>
+            <div style="font-size:9px;font-family:'Inter',sans-serif;color:var(--muted);font-weight:500;white-space:nowrap;">Prime Broker / Custodian</div>
+            <div style="font-size:9px;font-family:'Inter',sans-serif;color:var(--muted);font-weight:500;white-space:nowrap;">Auditor · Directors</div>
+          </div>
+        </div>
+
+        <!-- Compliance tag -->
+        <div style="margin-top:13px;display:inline-flex;padding:4px 9px;border:1px dashed var(--border);font-size:7.5px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.06em;">FATCA · CRS · AML/KYC · CBE · Bacen</div>
+
+      </div>
+    </div>
+
+    <div class="snum">01 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 02 POR QUE EXISTEM ════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="bar" style="background:var(--accent1)"></div>
+    <div class="tag t-navy">O ponto de partida</div>
+    <div class="h2">Por que fundos offshore <em>existem</em>?</div>
+
+    <div class="g3" style="gap:14px;margin-bottom:14px;">
+      <div class="card" style="border-top-color:var(--accent3)">
+        <div class="ct">Acesso a mercados</div>
+        <div class="cs">Bolsas globais, derivativos cross-border e ativos que não existem no mercado doméstico.</div>
+      </div>
+      <div class="card" style="border-top-color:var(--accent1)">
+        <div class="ct">Eficiência tributária</div>
+        <div class="cs">Jurisdições com regimes fiscais favoráveis permitem estruturas mais eficientes, legal e legítimo.</div>
+      </div>
+      <div class="card" style="border-top-color:var(--success)">
+        <div class="ct">Flexibilidade operacional</div>
+        <div class="cs">Short, alavancagem, derivativos complexos e cripto sem as restrições do mercado doméstico.</div>
+      </div>
+    </div>
+
+    <div class="box n">
+      <strong>Resumo prático:</strong> a estrutura offshore não é um atalho para fugir de regras, é uma escolha de <strong>plataforma</strong> para executar certas estratégias com mais eficiência.
+    </div>
+
+    <div class="snum">02 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 03 JURISDIÇÕES ════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="bar" style="background:linear-gradient(90deg,var(--accent1),var(--accent2))"></div>
+    <div class="tag t-amber">Onde ficam</div>
+    <div class="h2"><em>Onde</em> esses fundos são estruturados?</div>
+
+    <div class="g4" style="gap:11px;align-items:stretch;">
+      <div class="jc jc-n">
+        <div class="jf" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent3);">KY</div>
+        <div class="jn">Cayman Islands</div>
+        <div class="js">O hub global. Sem IR, sem CGT. Regulação CIMA flexível. Preferido para hedge funds e estruturas complexas.</div>
+        <div class="jp" style="background:rgba(26,58,107,.1);color:var(--accent3);">Mais comum</div>
+      </div>
+      <div class="jc jc-a">
+        <div class="jf" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent2);">BVI</div>
+        <div class="jn">BVI</div>
+        <div class="js">British Virgin Islands. Custo menor. Ideal para holdings e SPVs. Menos adotado para fundos ativos.</div>
+        <div class="jp" style="background:rgba(180,83,9,.1);color:var(--accent2);">Holdings / SPV</div>
+      </div>
+      <div class="jc jc-v">
+        <div class="jf" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text);">US</div>
+        <div class="jn">Delaware</div>
+        <div class="js">Acesso ao mercado americano. LP/LLC com flexibilidade societária e jurisprudência consolidada.</div>
+        <div class="jp" style="background:rgba(13,13,13,.08);color:var(--text);">Acesso EUA</div>
+      </div>
+      <div class="jc jc-g">
+        <div class="jf" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--success);">LU</div>
+        <div class="jn">Luxemburgo</div>
+        <div class="js">Hub europeu para UCITS. Distribuição para institucionais europeus. Maior compliance, maior prestígio.</div>
+        <div class="jp" style="background:rgba(4,120,87,.1);color:var(--success);">Distribuição EU</div>
+      </div>
+    </div>
+
+    <div class="box gr" style="margin-top:12px;font-size:12px;">
+      A escolha da jurisdição define: <strong>custo de setup</strong>, <strong>perfil regulatório</strong>, <strong>tipo de investidor aceito</strong> e <strong>tratamento fiscal</strong> dos retornos.
+    </div>
+
+    <div class="snum">03 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 04 ESTRUTURA POR DENTRO ══════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="bar" style="background:var(--accent3)"></div>
+    <div class="tag t-violet">A arquitetura</div>
+    <div class="h2">A <em>estrutura</em> por dentro</div>
+
+    <div style="display:flex;gap:18px;align-items:stretch;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:9px;">
+        <div class="box n" style="font-size:12px;">
+          <strong>O Fundo (veículo)</strong><br>
+          Em Cayman: SPC, LP ou Ltd. Cada forma tem implicações de responsabilidade e tributação distintas.
+        </div>
+        <div class="box a" style="font-size:12px;">
+          <strong>Investment Manager</strong><br>
+          O gestor registrado com poderes para investir. Pode ser a própria gestora BR ou uma entidade no exterior.
+        </div>
+        <div class="box v" style="font-size:12px;">
+          <strong>Investment Advisor</strong><br>
+          A gestora BR frequentemente atua como <em>advisor</em>, recomenda operações sem assumir responsabilidade regulatória direta no exterior.
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:9px;">
+        <div class="box g" style="font-size:12px;">
+          <strong>Administrator</strong><br>
+          Empresa independente que calcula o NAV, processa subscrições/resgates e produz relatórios. O "back-office" do fundo.
+        </div>
+        <div class="box gr" style="font-size:12px;">
+          <strong>Custodian / Prime Broker</strong><br>
+          Custodia os ativos. O PB vai além: fornece alavancagem, aluguel de ações e execução para estratégias sofisticadas.
+        </div>
+        <div class="box gr" style="font-size:12px;">
+          <strong>Directors (Board Independente)</strong><br>
+          Obrigatórios em Cayman. São os fiduciários que supervisionam o gestor em nome dos cotistas.
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">04 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 05 PRESTADORES ════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">Quem faz o quê</div>
+    <div class="h2">Os <em>prestadores</em> e seus papéis</div>
+
+    <div class="g2" style="gap:22px;align-items:start;">
+      <div>
+        <div class="pr">
+          <div class="pi">AD</div>
+          <div><div class="pn">Administrator</div><div class="pd">NAV diário/mensal, contabilidade, relatórios, processamento de subscrições e resgates. O "CFO" terceirizado do fundo.</div></div>
+        </div>
+        <div class="pr">
+          <div class="pi">RT</div>
+          <div><div class="pn">RTA: Registrar & Transfer Agent</div><div class="pd">Registro de cotistas, transferências de cotas, KYC de onboarding e controle do cap table do fundo.</div></div>
+        </div>
+        <div class="pr">
+          <div class="pi">AU</div>
+          <div><div class="pn">Auditor</div><div class="pd">Auditoria anual das demonstrações financeiras. Exigida por reguladores e investidores. Usualmente Big 4.</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="pr">
+          <div class="pi">DI</div>
+          <div><div class="pn">Directors (Independent)</div><div class="pd">Aprovam documentos, supervisionam o gestor, respondem por decisões fiduciárias. Board obrigatório em Cayman.</div></div>
+        </div>
+        <div class="pr">
+          <div class="pi">LC</div>
+          <div><div class="pn">Legal Counsel</div><div class="pd">Estruturação jurídica, redação do OM, revisão de contratos, compliance regulatório e políticas AML/KYC.</div></div>
+        </div>
+        <div class="pr">
+          <div class="pi">PB</div>
+          <div><div class="pn">Prime Broker</div><div class="pd">Custódia, alavancagem, aluguel de ativos, execução e serviços de margem. Goldman, MS, JPMorgan dominam.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">05 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 06 COMPLIANCE ════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="bar" style="background:linear-gradient(90deg,var(--danger),var(--accent2))"></div>
+    <div class="tag t-red">Regulação</div>
+    <div class="h2">Compliance: o que <em>não pode ignorar</em></div>
+
+    <div class="g2" style="gap:16px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="box a">
+          <strong>FATCA</strong> <span style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#888880;">Foreign Account Tax Compliance Act</span><br>
+          <span style="font-size:11.5px;color:#6B6860;">Lei americana que obriga instituições financeiras globais a reportar contas de americanos ao IRS. O fundo precisa se registrar como FFI.</span>
+        </div>
+        <div class="box n">
+          <strong>CRS</strong> <span style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#888880;">Common Reporting Standard (OCDE)</span><br>
+          <span style="font-size:11.5px;color:#6B6860;">Versão global do FATCA. +100 países trocam informações automaticamente. Cotistas brasileiros são reportados à Receita Federal.</span>
+        </div>
+        <div class="box r">
+          <strong>PFIC</strong> <span style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#888880;">cuidado com cotistas americanos</span><br>
+          <span style="font-size:11.5px;color:#6B6860;">Se houver americanos no fundo, pode ser classificado como PFIC, regime punitivo nos EUA. Requer análise específica antes de abrir o fundo a US persons.</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="box v">
+          <strong>AML / KYC</strong> <span style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#888880;">Anti-Money Laundering / Know Your Customer</span><br>
+          <span style="font-size:11.5px;color:#6B6860;">O fundo e o administrator têm obrigação de identificar e verificar todos os cotistas. Due diligence obrigatória com monitoramento contínuo.</span>
+        </div>
+        <div class="box g">
+          <strong>Reporting regulatório</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">Relatórios para CIMA (Cayman), SEC (EUA) ou CSSF (Luxemburgo). No Brasil: CVM 175 / Resolução CVM 175 + declaração CBE ao Bacen para cotistas com ativos &gt; USD 1M.</span>
+        </div>
+        <div class="box gr">
+          <strong>Documentação-chave</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">OM/PPM · Subscription Agreement · Side Letters · ISDA + CSA · Custody Agreement · Management Agreement. Cada documento tem cláusulas que definem seus direitos.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">06 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 07 FEEDER → MASTER ════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="bar" style="background:linear-gradient(90deg,var(--success),var(--accent1))"></div>
+    <div class="tag t-green">Brasil → Offshore</div>
+    <div class="h2">Feeder → Master: <em>como o dinheiro flui</em></div>
+
+    <div style="display:flex;gap:18px;align-items:stretch;">
+      <div style="flex:1.05;display:flex;flex-direction:column;gap:5px;justify-content:center;">
+        <div class="fblock" style="background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);">
+          <strong style="color:var(--danger);font-size:12px;">Cotista BR</strong>
+          <span style="font-size:11px;color:#888880;">: aplica BRL no fundo local</span>
+        </div>
+        <div style="text-align:center;font-size:13px;color:var(--muted)">↓ subscrição</div>
+        <div class="fblock" style="background:rgba(4,120,87,.06);border:1px solid rgba(4,120,87,.2);">
+          <strong style="color:var(--success);font-size:12px;">Fundo Local (Feeder)</strong>
+          <span style="font-size:11px;color:#888880;">: FIM/FIA regulado pela CVM 175</span><br>
+          <span style="font-size:11px;color:#888880;">Converte BRL → USD e investe nas cotas do offshore</span>
+        </div>
+        <div style="text-align:center;font-size:13px;color:var(--muted)">↓ remessa · Bacen</div>
+        <div class="fblock" style="background:rgba(26,58,107,.06);border:1px solid rgba(26,58,107,.2);">
+          <strong style="color:var(--accent3);font-size:12px;">Feeder Cayman</strong>
+          <span style="font-size:11px;color:#888880;">: recebe USD, subscreve master</span>
+        </div>
+        <div style="text-align:center;font-size:13px;color:var(--muted)">↓ alocação</div>
+        <div class="fblock" style="background:rgba(13,13,13,.04);border:1px solid rgba(13,13,13,.12);">
+          <strong style="color:var(--text);font-size:12px;">Master Fund</strong>
+          <span style="font-size:11px;color:#888880;">: executa a estratégia e consolida todos os feeders</span>
+        </div>
+      </div>
+
+      <div style="flex:.9;display:flex;flex-direction:column;gap:8px;justify-content:center;">
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Por que usar feeder/master?</div>
+        <ul class="lst">
+          <li><span class="d" style="background:var(--accent1)"></span><strong>Escala:</strong> múltiplos feeders (BR, EUA, EU) na mesma carteira → custo operacional menor por dólar gerido</li>
+          <li><span class="d" style="background:var(--success)"></span><strong>Segregação legal:</strong> risco do cotista BR fica no feeder local, não contamina o master</li>
+          <li><span class="d" style="background:var(--accent2)"></span><strong>Tributação por jurisdição:</strong> cada feeder aplica as regras fiscais dos seus cotistas</li>
+          <li><span class="d" style="background:var(--accent3)"></span><strong>Captação global:</strong> abre espaço para investidores estrangeiros entrarem direto no feeder offshore</li>
+        </ul>
+        <div class="box n" style="margin-top:4px;font-size:11.5px;">
+          <strong>Cuidado:</strong> o prazo de resgate do fundo local deve ser compatível com o do master. Não dá para prometer D+1 se o offshore é mensal.
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">07 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 08 TRIBUTAÇÃO BR ══════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">Tributação</div>
+    <div class="h2">O <em>imposto</em> que poucos detalham</div>
+
+    <div class="g2" style="gap:16px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Para o cotista BR</div>
+        <div class="box r">
+          <strong>Come-cotas semestral</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">Fundos de longo prazo têm antecipação compulsória de IR em maio e novembro, mesmo sem resgate. O offshore não escapa disso quando investido via fundo local.</span>
+        </div>
+        <div class="box a">
+          <strong>Variação cambial</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">O retorno inclui variação BRL/USD. Um real forte pode zerar o ganho em USD, ou um real fraco pode criar "lucro fiscal" mesmo com perda no portfólio.</span>
+        </div>
+        <div class="box n">
+          <strong>Withholding tax</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">Dividendos de ações americanas sofrem 30% WHT para fundos não cobertos por tax treaty. Impacta diretamente o retorno líquido da estratégia.</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Na estrutura offshore</div>
+        <div class="box g">
+          <strong>Cayman: zero tax no fundo</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">O fundo em si não paga imposto em Cayman. A tributação acontece no nível do cotista, em sua jurisdição. Isso é design, não evasão.</span>
+        </div>
+        <div class="box v">
+          <strong>CVM 175: FIE</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">A Resolução CVM 175 criou a classe FIE (Fundo de Investimento no Exterior). Regras específicas de disclosure, liquidez e gestão de risco cambial para fundos &gt;80% offshore.</span>
+        </div>
+        <div class="box gr">
+          <strong>Declaração ao Bacen (CBE)</strong><br>
+          <span style="font-size:11.5px;color:#6B6860;">Cotistas BR com ativos no exterior acima de USD 1M declaram anualmente ao Bacen via CBE. Pessoa física declara bens no exterior na DIRPF.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">08 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 09 CUSTOS REAIS ═══════════════════════════════ -->
+  <div class="slide" id="s9">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">Custo real</div>
+    <div class="h2">Os <em>custos</em> que ninguém lista no pitch</div>
+
+    <div class="g2" style="gap:22px;align-items:start;">
+      <div>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Setup (one-time)</div>
+        <div class="cr"><span class="cn">Legal: Cayman counsel + OM</span></div>
+        <div class="cr"><span class="cn">Registro CIMA</span></div>
+        <div class="cr"><span class="cn">Incorporation (SPC / LP)</span></div>
+        <div style="margin-top:10px;padding:9px 11px;background:rgba(180,83,9,.06);border:1px solid rgba(180,83,9,.2);border-radius:8px;font-size:12px;">
+          <strong style="color:var(--accent2)">Custo de setup relevante</strong><br>
+          <span style="color:#888880;">Antes de mover um centavo.</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Manutenção anual (recorrente)</div>
+        <div class="cr"><span class="cn">Administrator (NAV + relatórios)</span></div>
+        <div class="cr"><span class="cn">Auditoria Big 4</span></div>
+        <div class="cr"><span class="cn">Directors independentes (2)</span></div>
+        <div class="cr"><span class="cn">CIMA annual fee</span></div>
+        <div class="cr"><span class="cn">Legal (compliance contínuo)</span></div>
+        <div style="margin-top:10px;padding:9px 11px;background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.2);border-radius:8px;font-size:12px;">
+          <strong style="color:var(--danger)">Custo fixo anual independente da performance</strong><br>
+          <span style="color:#888880;">Independente da performance.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box gr" style="margin-top:12px;font-size:12px;">
+      <strong>Break-even de escala:</strong> os custos fixos da estrutura consomem uma fatia maior do retorno quanto menor o AUM, o que torna o dimensionamento do fundo uma decisão crítica antes de montar a estrutura.
+    </div>
+
+    <div class="snum">09 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 10 GOVERNANÇA / BASTIDORES ═══════════════════ -->
+  <div class="slide" id="s10">
+    <div class="bar" style="background:var(--accent3)"></div>
+    <div class="tag t-violet">Bastidores</div>
+    <div class="h2">O que a governança <em>realmente</em> significa</div>
+
+    <div class="g2" style="gap:16px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="rb" style="background:rgba(26,58,107,.04);border-color:rgba(26,58,107,.22);">
+          <div><div class="rt">Directors: independência de verdade?</div><div class="rd">Muitos "directors profissionais" sentam em centenas de boards. Cobram USD 10–15k por assento e raramente questionam o gestor, a menos que algo errado apareça.</div></div>
+        </div>
+        <div class="rb" style="background:rgba(180,83,9,.04);border-color:rgba(180,83,9,.18);">
+          <div><div class="rt">Side Letters e desigualdade</div><div class="rd">Investidores âncora negociam taxas menores, resgates mais rápidos e acesso a informações exclusivas. Tudo legal, mas a maioria dos cotistas não sabe que existe.</div></div>
+        </div>
+        <div class="rb" style="background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.18);">
+          <div><div class="rt">Gates e suspensão de resgates</div><div class="rd">O OM quase sempre permite suspender resgates em situações de stress. Em 2020 e 2022, vários fundos ativaram gates. O cotista BR pode ficar preso.</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="rb" style="background:rgba(26,58,107,.04);border-color:rgba(26,58,107,.22);">
+          <div><div class="rt">Rehypothecation do Prime Broker</div><div class="rd">O PB pode reutilizar ativos do fundo como colateral próprio (se o contrato permitir). Multiplica risco de contraparte, relevante em stress do PB.</div></div>
+        </div>
+        <div class="rb" style="background:rgba(4,120,87,.04);border-color:rgba(4,120,87,.18);">
+          <div><div class="rt">NAV e ativos ilíquidos</div><div class="rd">Em fundos com alocação em privates, o gestor informa os preços dos ativos ilíquidos ao administrator. Essa subjetividade pode mascarar volatilidade real.</div></div>
+        </div>
+        <div class="rb" style="background:rgba(26,58,107,.04);border-color:rgba(26,58,107,.22);">
+          <div><div class="rt">Look-through limitado</div><div class="rd">Cotista BR → fundo local → feeder → master → sub-funds. Muitas camadas, pouca visibilidade real sobre os ativos finais.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum">10 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 11 PLATAFORMA OPERACIONAL ══════════════════ -->
+  <div class="slide" id="s11">
+    <div class="bar"></div>
+    <div class="tag t-green">Plataforma operacional</div>
+    <div class="h2">O que a estrutura offshore <em>habilita</em></div>
+
+    <div class="g2" style="gap:22px;align-items:start;">
+
+      <!-- LEFT: flow + insight -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:12.5px;line-height:1.6;color:rgba(13,13,13,.62);margin:0;">
+          O master fund não é apenas o veículo de investimento. É a entidade que assina os contratos que abrem acesso a mercados inacessíveis ao fundo doméstico.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:0;font-family:'Inter',sans-serif;margin-top:4px;">
+          <div style="font-size:10.5px;font-weight:700;color:var(--text);padding:5px 10px;border:1.5px solid var(--text);width:fit-content;">Master Fund (Cayman)</div>
+          <div style="font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:2px 0 2px 11px;letter-spacing:.03em;">↓ assina</div>
+          <div style="font-size:10.5px;font-weight:600;color:var(--accent3);padding:5px 10px;border:1px solid rgba(26,58,107,.25);background:rgba(26,58,107,.04);width:fit-content;">ISDA Master Agreement + CSA</div>
+          <div style="font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:2px 0 2px 11px;letter-spacing:.03em;">↓ habilita</div>
+          <div style="font-size:8.5px;color:var(--success);padding:5px 10px;border:1px solid rgba(26,107,60,.22);background:rgba(26,107,60,.04);width:fit-content;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;">Derivativos OTC · Bonds · Short · Alavancagem</div>
+        </div>
+
+        <div class="box r" style="font-size:11.5px;margin-top:4px;">
+          Sem ISDA, o fundo doméstico não negocia swaps bilaterais, CDS nem TRS com contrapartes internacionais.
+        </div>
+      </div>
+
+      <!-- RIGHT: 3 categories -->
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="box n" style="font-size:12px;">
+          <strong>Via ISDA / OTC</strong><br>
+          <span style="color:#6B6860;">Interest rate swaps, cross-currency swaps, CDS, total return swaps (TRS), variance swaps. Estratégias de hedge e retorno absoluto que exigem contraparte bilateral e colateral via CSA.</span>
+        </div>
+        <div class="box g" style="font-size:12px;">
+          <strong>Via Prime Broker</strong><br>
+          <span style="color:#6B6860;">Stock lending para posições short, repo para alavancagem, margin financing e execução global. O PB viabiliza estratégias long/short que o mercado doméstico não comporta operacionalmente.</span>
+        </div>
+        <div class="box a" style="font-size:12px;">
+          <strong>Via estrutura Cayman</strong><br>
+          <span style="color:#6B6860;">Bonds soberanos e corporativos internacionais, mercados de crédito privado e estratégias em jurisdições que exigem contraparte offshore. Acesso direto a mercados que não existem na plataforma local.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="snum">11 / 12</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- ══ 12 FECHAMENTO ════════════════════════════════ -->
+  <div class="slide slide-dark" id="s12">
+    <div class="bar" style="background:linear-gradient(90deg,#0f766e,#1d4ed8,#7c3aed)"></div>
+    <div class="deco" style="width:360px;height:360px;right:-70px;bottom:-110px;border:1px solid rgba(96,165,250,.06)"></div>
+    <div class="deco" style="width:200px;height:200px;right:40px;bottom:-5px;border:1px solid rgba(52,211,153,.05)"></div>
+
+    <div class="tag t-dark">Reflexão final</div>
+    <div class="display" style="color:#EDE9E0;font-size:38px;line-height:1.1;">
+      Estrutura é meio,<br>não <em style="color:#D4A843;">fim</em>
+    </div>
+
+    <p class="lead" style="color:rgba(237,233,224,.65);max-width:680px;font-size:14.5px;">
+      Cayman, BVI, Delaware, a jurisdição, por si só, não define a qualidade de um fundo.<br>
+      O veículo offshore é apenas a <strong style="color:#EDE9E0;">plataforma</strong>. O que gera resultado é a estratégia, a equipe e a disciplina operacional dentro dela.
+    </p>
+
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <div class="dbox b" style="flex:1;font-size:12px;">
+        <strong>A estrutura importa</strong><br>
+        Entender os players, os contratos e o fluxo de responsabilidades é o primeiro passo para trabalhar bem com qualquer veículo offshore.
+      </div>
+      <div class="dbox g" style="flex:1;font-size:12px;">
+        <strong>O mercado evolui</strong><br>
+        CVM 175, CRS, FATCA, o arcabouço regulatório continua se sofisticando. Quem domina a estrutura se adapta mais rápido.
+      </div>
+      <div class="dbox a" style="flex:1;font-size:12px;">
+        <strong>A conversa continua</strong><br>
+        Há muito mais para explorar: tributação, estratégias específicas, tendências de jurisdição. Quais tópicos te interessam?
+      </div>
+    </div>
+
+
+<div class="snum snum-d">12 / 12</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div><!-- #stage -->
+
+<div id="progress-bar"><div id="progress-fill" style="width:8.33%"></div></div>
+
+<!-- ─── Controls ──────────────────────────────────── -->
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 11</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+  const slides   = document.querySelectorAll('.slide');
+  const fill     = document.getElementById('progress-fill');
+  const counter  = document.getElementById('counter');
+  const btnPrev  = document.getElementById('btn-prev');
+  const btnNext  = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+
+    counter.textContent  = (cur + 1) + ' / ' + N;
+    fill.style.width     = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled     = cur === 0;
+    btnNext.disabled     = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

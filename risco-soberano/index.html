@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risco Soberano · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:   #00B894;
+  --teal2:  #009B7D;
+  --tealbg: rgba(0,184,148,.07);
+  --dark:   #1A1A1A;
+  --text:   #111;
+  --muted:  #999;
+  --border: #E2E2E2;
+  --bg:     #FFFFFF;
+  --danger: #C4192C;
+  --amber:  #8B6914;
+  --w: 900px;
+  --h: 506px;
+}
+
+body {
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  padding: 24px;
+  gap: 20px;
+}
+
+#stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  padding: 40px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity .42s ease, transform .42s ease;
+  overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > *    { position: relative; z-index: 1; }
+
+.slide-dark { background: var(--dark) !important; color: #F0F0F0; }
+.slide-dark .h2 { color: #F0F0F0; }
+.slide-dark .h2 em { color: var(--teal); }
+
+.deco { position: absolute; z-index: 0; }
+.bar  { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--teal); }
+
+.tag {
+  display: inline-flex; align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase;
+  padding: 0 0 4px 0;
+  border: none; border-bottom: 1.5px solid currentColor;
+  background: none;
+  width: fit-content; margin-bottom: 14px;
+}
+.t-teal  { color: var(--teal); }
+.t-muted { color: var(--muted); }
+.t-dark  { color: rgba(240,240,240,.42); border-bottom-color: rgba(240,240,240,.18); }
+
+.display {
+  font-family: 'Outfit', sans-serif;
+  font-size: 50px; line-height: 1.0;
+  letter-spacing: -.025em; margin-bottom: 14px;
+  font-weight: 800;
+}
+.display em { font-style: italic; color: var(--teal); }
+
+.h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px; line-height: 1.1;
+  letter-spacing: -.015em; margin-bottom: 18px;
+  font-weight: 700;
+}
+.h2 em { font-style: italic; color: var(--teal); }
+.h2 .t { color: var(--teal); }
+
+.lead {
+  font-size: 15.5px; line-height: 1.65;
+  color: rgba(17,17,17,.52); max-width: 600px; margin-bottom: 16px;
+}
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; }
+.g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 11px; }
+
+.card {
+  background: #fff; border: 1px solid var(--border);
+  border-top: 3px solid var(--teal);
+  padding: 14px 16px;
+}
+.card .ct { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.card .cv { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 700; line-height: 1.2; }
+.card .cs { font-size: 13.5px; color: #666; margin-top: 5px; line-height: 1.45; }
+
+.box { padding: 10px 13px 10px 14px; font-size: 14.5px; line-height: 1.55; border: none; border-left: 3px solid; }
+.box.t  { border-color: var(--teal);   background: var(--tealbg); }
+.box.t2 { border-color: var(--teal2);  background: rgba(0,155,125,.06); }
+.box.r  { border-color: var(--danger); background: rgba(196,25,44,.04); }
+.box.a  { border-color: var(--amber);  background: rgba(139,105,20,.04); }
+.box.d  { border-color: #333;          background: rgba(0,0,0,.03); }
+.box.gr { border-color: var(--border); background: rgba(0,0,0,.02); }
+
+.dbox { padding: 11px 14px; font-size: 14px; line-height: 1.55; border: none; border-left: 2px solid; }
+.dbox.t { border-color: rgba(0,184,148,.55); background: rgba(0,184,148,.09); color: rgba(240,240,240,.82); }
+.dbox.d { border-color: rgba(240,240,240,.2); background: rgba(240,240,240,.04); color: rgba(240,240,240,.75); }
+.dbox.r { border-color: rgba(196,25,44,.45);  background: rgba(196,25,44,.07); color: rgba(240,240,240,.78); }
+
+.lst { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.lst li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.5; color: rgba(17,17,17,.7); }
+.lst li .d { width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; background: var(--teal); }
+.lst li strong { color: var(--text); font-weight: 600; }
+
+.snum  { position: absolute; bottom: 18px; right: 26px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(17,17,17,.15); letter-spacing: .05em; }
+.snum-d { color: rgba(240,240,240,.18) !important; }
+.sfoot  { position: absolute; bottom: 15px; left: 26px; display: flex; align-items: center; gap: 5px; z-index: 10; }
+.sfoot span { font-size: 11.5px; font-weight: 500; letter-spacing: .04em; color: rgba(17,17,17,.24); }
+.sfoot-d span { color: rgba(240,240,240,.22) !important; }
+
+#progress-bar { width: var(--w); height: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--teal); transition: width .42s ease; }
+#controls { display: flex; align-items: center; gap: 14px; }
+
+.btn {
+  width: 38px; height: 38px; border-radius: 2px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+  color: #C8C4BC; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; user-select: none;
+}
+.btn:hover    { background: rgba(255,255,255,.14); }
+.btn:disabled { opacity: .25; cursor: default; }
+
+#counter { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: #555; min-width: 48px; text-align: center; }
+
+#btn-print {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 2px;
+  background: rgba(0,184,148,.12); border: 1px solid rgba(0,184,148,.3);
+  color: #00B894; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+  transition: background .2s;
+}
+#btn-print:hover { background: rgba(0,184,148,.22); }
+
+@media print {
+  @page { size: 900px 506px; margin: 0; }
+  body { background: #111 !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position: static !important; width: 900px !important; height: 506px !important; overflow: visible !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+  .slide { position: relative !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; display: flex !important; width: 900px !important; height: 506px !important; page-break-after: always; break-after: page; overflow: hidden !important; }
+  .slide.exit { display: none !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- SLIDE 01: COVER -->
+  <div class="slide slide-dark active" id="s1" style="padding:0;">
+    <!-- City photo full bleed, lighter overlay to show more background -->
+    <div style="position:absolute;inset:0;
+      background-image:linear-gradient(rgba(18,18,18,.42),rgba(18,18,18,.42)),url('cover.jpg');
+      background-size:cover;background-position:center 35%;z-index:0;"></div>
+    <!-- Left content -->
+    <div style="position:absolute;left:0;top:0;bottom:0;right:330px;
+      padding:50px;display:flex;flex-direction:column;justify-content:center;z-index:2;">
+      <div style="font-size:11.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#00B894;padding-bottom:4px;border-bottom:1.5px solid #00B894;width:fit-content;margin-bottom:20px;">Risco Soberano</div>
+      <div style="font-family:'Outfit',sans-serif;font-size:44px;font-weight:800;color:#F2F2F2;line-height:1.0;letter-spacing:-.025em;margin-bottom:18px;">
+        Quatro formas<br>de investir<br>num país.
+      </div>
+      <div style="width:44px;height:3px;background:#00B894;margin-bottom:14px;"></div>
+      <div style="font-family:'Outfit',sans-serif;font-size:21px;font-weight:700;font-style:italic;color:#00B894;line-height:1.2;">
+        Três erram a tese.
+      </div>
+    </div>
+    <!-- Right panel: gradiente teal + curva suave -->
+    <div style="position:absolute;right:0;top:0;width:330px;height:100%;z-index:3;
+      clip-path:path('M 40,0 C 0,150 0,356 40,506 L 330,506 L 330,0 Z');
+      overflow:hidden;">
+      <div style="position:absolute;inset:0;
+        background:linear-gradient(160deg, #00C9A7 0%, #007A62 45%, #003D31 100%);"></div>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.15);"></div>
+      <div style="position:relative;z-index:1;height:100%;padding:36px 28px 36px 60px;
+        display:flex;flex-direction:column;justify-content:center;gap:0;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:14px;">Os instrumentos</div>
+        <div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);">
+          <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,.22);line-height:1;flex-shrink:0;min-width:40px;">01</span>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#FFFFFF;margin-bottom:2px;">Sovereign Bond</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);">Crédito + Duration</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);">
+          <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,.22);line-height:1;flex-shrink:0;min-width:40px;">02</span>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#FFFFFF;margin-bottom:2px;">CDS</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);">Crédito puro</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);">
+          <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,.22);line-height:1;flex-shrink:0;min-width:40px;">03</span>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#FFFFFF;margin-bottom:2px;">Forward / NDF</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);">Câmbio</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:9px 0;">
+          <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,.22);line-height:1;flex-shrink:0;min-width:40px;">04</span>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#FFFFFF;margin-bottom:2px;">IRS / Taxa Local</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);">Prêmio real (com FX)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="snum snum-d">01 / 09</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 02: SETUP -->
+  <div class="slide" id="s2">
+    <div class="bar"></div>
+    <!-- decorative circles top-right -->
+    <div class="deco" style="top:-14px;right:42px;opacity:.08;">
+      <svg width="90" height="62" viewBox="0 0 90 62" fill="none">
+        <circle cx="30" cy="31" r="28" stroke="#00B894" stroke-width="2"/>
+        <circle cx="60" cy="31" r="28" stroke="#00B894" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="tag t-teal">O Problema</div>
+    <div class="h2">Soberano <em>não é</em> uma dimensão. São três.</div>
+    <div class="g3" style="gap:14px;align-items:start;">
+      <div>
+        <div class="box r" style="margin-bottom:10px;">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--danger);margin-bottom:4px;">Crédito</div>
+          <div style="font-size:14px;line-height:1.5;color:rgba(17,17,17,.68);">O país vai pagar a dívida? Probabilidade de default. Spread sobre o risk-free.</div>
+        </div>
+        <div class="box a" style="margin-bottom:10px;">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px;">Câmbio</div>
+          <div style="font-size:14px;line-height:1.5;color:rgba(17,17,17,.68);">A moeda vai aguentar? Desvalorização, controles de capital, crise cambial.</div>
+        </div>
+        <div class="box t">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--teal2);margin-bottom:4px;">Taxa Real</div>
+          <div style="font-size:14px;line-height:1.5;color:rgba(17,17,17,.68);">O prêmio local compensa a inflação? Diferencial de juros reais em ARS vs. USD.</div>
+        </div>
+      </div>
+      <div style="grid-column:span 2;">
+        <p class="lead" style="font-size:15.5px;margin-bottom:14px;">Cada instrumento acessa uma dessas dimensões. Às vezes duas. Raramente as três ao mesmo tempo.</p>
+        <p class="lead" style="font-size:15.5px;margin-bottom:14px;">O erro mais comum: ter uma visão de crédito e expressar via câmbio. Ou usar um bond que carrega duration que você não queria.</p>
+        <div class="box d" style="font-size:15px;">
+          A pergunta antes de qualquer trade soberano: <strong>qual dimensão exatamente estou expressando?</strong>
+        </div>
+      </div>
+    </div>
+    <div class="snum">02 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 03: SOVEREIGN BOND -->
+  <div class="slide" id="s3">
+    <div class="bar"></div>
+    <div class="tag t-teal">Instrumento 1 — Sovereign Bond</div>
+    <div class="h2">O bond soberano dá crédito <em>e</em> duration ao mesmo tempo.</div>
+    <div class="g2" style="gap:20px;align-items:start;">
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">O que você recebe</div>
+        <ul class="lst" style="margin-bottom:12px;">
+          <li><div class="d"></div><span><strong>Cupom periódico</strong> — carry enquanto a posição existe</span></li>
+          <li><div class="d"></div><span><strong>Principal</strong> no vencimento, se o país honrar</span></li>
+          <li><div class="d"></div><span><strong>Ganho de capital</strong> se o spread comprimir</span></li>
+        </ul>
+        <div class="box t" style="font-size:14.5px;">
+          Melhor quando você quer <strong>carry no caminho</strong> e tem convicção de que o spread vai fechar.
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">O que vem junto (sem querer)</div>
+        <ul class="lst" style="margin-bottom:12px;">
+          <li><div class="d"></div><span><strong>Duration</strong> — sensibilidade a juros americanos, independente do país</span></li>
+          <li><div class="d"></div><span><strong>Liquidez</strong> colapsa no momento de estresse máximo</span></li>
+          <li><div class="d"></div><span><strong>Capital intensivo</strong> — para crédito puro, há formas mais eficientes</span></li>
+        </ul>
+        <div class="box r" style="font-size:14.5px;">
+          Em 2020, bonds argentinos perderam 30–50% antes da reestruturação. A liquidez desapareceu quando importava.
+        </div>
+      </div>
+    </div>
+    <div class="snum">03 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 04: CDS -->
+  <div class="slide" id="s4">
+    <div class="bar"></div>
+    <div class="tag t-teal">Instrumento 2 — CDS</div>
+    <div class="h2"><span class="t">CDS</span> é crédito puro. O problema <em>é a definição de sinistro.</em></div>
+    <div class="g2" style="gap:20px;align-items:start;">
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">Como funciona</div>
+        <ul class="lst" style="margin-bottom:12px;">
+          <li><div class="d"></div><span><strong>Comprador de proteção</strong> paga spread anual (ex: 800 bps)</span></li>
+          <li><div class="d"></div><span>Em evento de crédito ISDA, recebe <strong>face value</strong> do bond de referência</span></li>
+          <li><div class="d"></div><span>Sem exposição a duration ou FX — <strong>crédito puro</strong></span></li>
+          <li><div class="d"></div><span>Mais eficiente em capital do que short de bond</span></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">O risco que poucos discutem</div>
+        <div class="box r" style="font-size:14.5px;margin-bottom:10px;">
+          <strong>Definição de evento importa.</strong> Em 2014, o caso NML Capital virou meses de debate jurídico. O CDS não disparou de forma imediata ou limpa.
+        </div>
+        <div class="box a" style="font-size:14.5px;">
+          Em 2020, a reestruturação demorou 6 meses. O spread chegou a 3.000+ bps — entrar tarde tem custo alto.
+        </div>
+      </div>
+    </div>
+    <div class="snum">04 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 05: FORWARD / NDF -->
+  <div class="slide" id="s5">
+    <div class="bar"></div>
+    <div class="tag t-teal">Instrumento 3 — Forward / NDF</div>
+    <div class="h2">NDF é <em>tese cambial</em>, não tese de crédito.</div>
+    <div class="g2" style="gap:20px;align-items:start;">
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">Mecânica</div>
+        <ul class="lst" style="margin-bottom:12px;">
+          <li><div class="d"></div><span><strong>NDF</strong> (Non-Deliverable Forward) — forward sem entrega física da moeda</span></li>
+          <li><div class="d"></div><span>Necessário quando há <strong>controles de capital</strong> — ARS não é livremente conversível</span></li>
+          <li><div class="d"></div><span>Liquidação em USD na diferença entre taxa acordada e mercado</span></li>
+          <li><div class="d"></div><span>Custo embutido na taxa forward, refletindo o diferencial de juros</span></li>
+        </ul>
+        <div class="box a" style="font-size:14.5px;">
+          Em 2023, ARS/USD oficial estava em ~380. O dólar blue chegou a 1.100. O NDF capturou parte desse diferencial.
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">Quando usar vs. não usar</div>
+        <div class="box t" style="font-size:14.5px;margin-bottom:10px;">
+          <strong>Usar quando:</strong> a tese é desvalorização cambial. O país pode honrar bonds externos enquanto a moeda local colapsa. São eventos separados.
+        </div>
+        <div class="box r" style="font-size:14.5px;">
+          <strong>Não confundir:</strong> default externo e colapso cambial têm correlação alta, mas não são a mesma coisa. Em 2001 ocorreram juntos. Nem sempre é assim.
+        </div>
+      </div>
+    </div>
+    <div class="snum">05 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 06: LOCAL INTEREST RATE / IRS -->
+  <div class="slide" id="s6">
+    <div class="bar"></div>
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+      <div style="width:290px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding-right:32px;">
+        <div class="tag t-teal">Instrumento 4 — Taxa Local</div>
+        <div class="h2" style="font-size:29px;margin-bottom:12px;">Taxa local. O instrumento <span class="t">mais puro</span> é o swap.</div>
+        <p style="font-size:14.5px;line-height:1.65;color:rgba(17,17,17,.52);">
+          O bond local carrega crédito do emissor. O swap isola a taxa. Na prática, liquidez decide.
+        </p>
+      </div>
+      <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
+      <div style="flex:1;padding-left:32px;display:flex;flex-direction:column;justify-content:center;gap:10px;">
+        <div style="padding:13px 16px;border:1px solid rgba(0,184,148,.25);background:rgba(0,184,148,.05);">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;">Instrumento mais puro</div>
+          <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:4px;">IRS — Fixo × BADLAR</div>
+          <div style="font-size:14.5px;color:#555;line-height:1.45;">Taxa pura. Sem crédito do emissor. Exposição direta ao diferencial de juros real em ARS.</div>
+        </div>
+        <div style="padding:13px 16px;border:1px solid var(--border);background:rgba(0,0,0,.02);">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Na prática — mais líquido</div>
+          <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:4px;">Bond CER / UVA</div>
+          <div style="font-size:14.5px;color:#555;line-height:1.45;">Indexado à inflação. Mais acessível, mas carrega crédito soberano local embutido.</div>
+        </div>
+        <div class="box r" style="font-size:14.5px;">
+          <strong>FX não hedgeado em ambos.</strong> 100% a.a. em ARS viram zero se o peso depreciar 50% no mesmo período.
+        </div>
+      </div>
+    </div>
+    <div class="snum">06 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 07: COMPARATIVO -->
+  <div class="slide" id="s7">
+    <div class="bar"></div>
+    <!-- decorative circles -->
+    <div class="deco" style="top:-10px;right:44px;opacity:.07;">
+      <svg width="90" height="62" viewBox="0 0 90 62" fill="none">
+        <circle cx="30" cy="31" r="28" stroke="#00B894" stroke-width="2"/>
+        <circle cx="60" cy="31" r="28" stroke="#00B894" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="tag t-teal">Comparativo</div>
+    <div class="h2" style="margin-bottom:16px;">Qual instrumento para <em>qual tese</em>.</div>
+    <div class="g4">
+      <div class="card">
+        <div class="ct">Sovereign Bond</div>
+        <div class="cv" style="color:var(--text);">Crédito + Duration</div>
+        <div class="cs">Carry no caminho. Capital intensivo. Liquidez colapsa no estresse.</div>
+        <div style="margin-top:9px;padding:6px 8px;background:rgba(0,184,148,.05);border-left:2px solid var(--teal);font-size:12.5px;color:#666;line-height:1.4;">Carry: positivo (cupom)<br>Acesso: mercado secundário</div>
+      </div>
+      <div class="card">
+        <div class="ct">CDS</div>
+        <div class="cv" style="color:var(--text);">Crédito puro</div>
+        <div class="cs">Eficiente em capital. Sem duration. Paga spread até o evento.</div>
+        <div style="margin-top:9px;padding:6px 8px;background:rgba(0,184,148,.05);border-left:2px solid var(--teal);font-size:12.5px;color:#666;line-height:1.4;">Carry: negativo (comprador de proteção paga spread)<br>Acesso: institucional / ISDA</div>
+      </div>
+      <div class="card">
+        <div class="ct">Forward / NDF</div>
+        <div class="cv" style="color:var(--text);">Câmbio</div>
+        <div class="cs">Tese de desvalorização. Custo embutido na taxa forward.</div>
+        <div style="margin-top:9px;padding:6px 8px;background:rgba(0,184,148,.05);border-left:2px solid var(--teal);font-size:12.5px;color:#666;line-height:1.4;">Carry: custo no forward<br>Acesso: dealers / prime brokers</div>
+      </div>
+      <div class="card">
+        <div class="ct">IRS / Bond Local</div>
+        <div class="cv" style="color:var(--text);">Taxa real pura</div>
+        <div class="cs">Swap isola a taxa; bond carrega crédito local. FX não hedgeado em ambos.</div>
+        <div style="margin-top:9px;padding:6px 8px;background:rgba(0,184,148,.05);border-left:2px solid var(--teal);font-size:12.5px;color:#666;line-height:1.4;">Carry: positivo (nominal)<br>Acesso: OTC / conta local</div>
+      </div>
+    </div>
+    <div class="snum">07 / 09</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 08: CASE ARGENTINA (dark) -->
+  <div class="slide slide-dark" id="s8">
+    <div class="bar"></div>
+    <div class="tag t-dark">Ilustração histórica — Argentina</div>
+    <div class="h2" style="margin-bottom:18px;">Três fases. Três instrumentos. <em>Timing diferente.</em></div>
+    <div class="g3" style="gap:13px;">
+      <!-- 01 CDS -->
+      <div style="padding:16px 18px;border:1px solid rgba(0,184,148,.25);background:rgba(0,184,148,.07);">
+        <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:rgba(0,184,148,.35);line-height:1;margin-bottom:10px;">01</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,240,240,.42);margin-bottom:7px;">Tese: Default Formal</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:#F0F0F0;margin-bottom:6px;">CDS</div>
+        <div style="font-size:14px;color:rgba(240,240,240,.6);line-height:1.45;margin-bottom:8px;">Crédito puro. Sem duration, sem FX. Paga spread até o evento ISDA.</div>
+        <div style="padding:6px 8px;border-left:2px solid rgba(0,184,148,.4);background:rgba(0,184,148,.08);font-size:12.5px;color:rgba(240,240,240,.52);line-height:1.4;">Risco: definição de evento. Disputas em 2014 e 2020.</div>
+      </div>
+      <!-- 02 NDF -->
+      <div style="padding:16px 18px;border:1px solid rgba(240,240,240,.09);background:rgba(240,240,240,.03);">
+        <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:rgba(240,240,240,.12);line-height:1;margin-bottom:10px;">02</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,240,240,.42);margin-bottom:7px;">Tese: Colapso do Peso</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:#F0F0F0;margin-bottom:6px;">NDF — Short ARS</div>
+        <div style="font-size:14px;color:rgba(240,240,240,.6);line-height:1.45;margin-bottom:8px;">Tese cambial, não de crédito. ARS pode colapsar antes do default.</div>
+        <div style="padding:6px 8px;border-left:2px solid rgba(240,240,240,.18);background:rgba(240,240,240,.04);font-size:12.5px;color:rgba(240,240,240,.52);line-height:1.4;">2023: dólar blue 200% acima do oficial.</div>
+      </div>
+      <!-- 03 Bond -->
+      <div style="padding:16px 18px;border:1px solid rgba(240,240,240,.09);background:rgba(240,240,240,.03);">
+        <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:rgba(240,240,240,.12);line-height:1;margin-bottom:10px;">03</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,240,240,.42);margin-bottom:7px;">Tese: Carry + Distress</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:#F0F0F0;margin-bottom:6px;">Bond Soberano</div>
+        <div style="font-size:14px;color:rgba(240,240,240,.6);line-height:1.45;margin-bottom:8px;">Carry mais potencial de recuperação. Exige convicção de prazo.</div>
+        <div style="padding:6px 8px;border-left:2px solid rgba(240,240,240,.18);background:rgba(240,240,240,.04);font-size:12.5px;color:rgba(240,240,240,.52);line-height:1.4;">Capital intensivo. Liquidez colapsa no pior momento.</div>
+      </div>
+    </div>
+    <div class="snum snum-d">08 / 09</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 09: CLOSE (dark) -->
+  <div class="slide slide-dark" id="s9">
+    <div class="bar"></div>
+    <!-- large decorative circles -->
+    <div class="deco" style="right:-60px;top:-60px;opacity:.06;">
+      <svg width="320" height="230" viewBox="0 0 320 230" fill="none">
+        <circle cx="110" cy="115" r="105" stroke="#00B894" stroke-width="2.5"/>
+        <circle cx="210" cy="115" r="105" stroke="#00B894" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div class="tag t-dark">Conclusão</div>
+    <div class="display" style="color:#F2F2F2;font-size:40px;line-height:1.05;margin-bottom:14px;">
+      O instrumento certo depende<br>de qual risco <em>você está expressando.</em>
+    </div>
+    <p style="font-size:15.5px;line-height:1.65;color:rgba(240,240,240,.52);max-width:660px;margin-bottom:18px;">
+      Estar certo na tese macro e errado no instrumento é erro de execução, não de análise. Os dois resultados parecem iguais no P&L.
+    </p>
+    <div style="display:flex;gap:10px;">
+      <div class="dbox t" style="flex:1;font-size:14px;"><strong>Default</strong><br>CDS — crédito puro, sem duration, sem FX</div>
+      <div class="dbox d" style="flex:1;font-size:14px;"><strong>Câmbio</strong><br>NDF — short ARS quando a tese é moeda, não crédito</div>
+      <div class="dbox d" style="flex:1;font-size:14px;"><strong>Carry / Distress</strong><br>Bond soberano — se quer carry com visão de recuperação</div>
+    </div>
+    <p style="font-size:13px;color:rgba(240,240,240,.32);max-width:700px;margin-top:14px;line-height:1.55;">
+      Estes são os quatro principais. Existem diversas outras formas de capturar alpha em mercados soberanos — ADRs, ETFs locais, credit-linked notes, opções sobre bonds em distress. O princípio de decompor as dimensões de risco vale para qualquer um deles.
+    </p>
+    <div class="snum snum-d">09 / 09</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:11.11%"></div></div>
+
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 9</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+  const slides  = document.querySelectorAll('.slide');
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+    counter.textContent = (cur + 1) + ' / ' + N;
+    fill.style.width    = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled    = cur === 0;
+    btnNext.disabled    = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+
+</body>
+</html>

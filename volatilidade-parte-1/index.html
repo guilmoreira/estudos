@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volatilidade: O que mede · Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent1: #C4192C; --accent2: #8B6914; --accent3: #1A3A6B;
+  --text: #0D0D0D; --muted: #888880; --danger: #C4192C;
+  --success: #1A6B3C; --border: #D4D0C8; --bg: #FDFAF5;
+  --w: 900px; --h: 1125px;
+}
+body { background: #1C1C1C; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; color: var(--text); padding: 24px; gap: 20px; }
+#stage { position: relative; width: var(--w); height: var(--h); overflow: hidden; border-radius: 2px; box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); }
+.slide { position: absolute; inset: 0; background: var(--bg); padding: 60px 56px 52px; display: flex; flex-direction: column; justify-content: flex-start; opacity: 0; pointer-events: none; transform: translateX(40px); transition: opacity .42s ease, transform .42s ease; overflow: hidden; }
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > *    { position: relative; z-index: 1; }
+.slide-dark { background: #0F0F0F !important; color: #EDE9E0; }
+.deco { position: absolute; border-radius: 50%; z-index: 0; }
+.bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent1); }
+.tag { display: inline-flex; font-size: 9.5px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; padding: 0 0 4px 0; border-bottom: 1.5px solid currentColor; background: none; width: fit-content; margin-bottom: 20px; }
+.t-navy { color: var(--accent3); } .t-amber { color: var(--accent2); } .t-green { color: var(--success); } .t-red { color: var(--danger); } .t-dark { color: rgba(237,233,224,.45); border-bottom-color: rgba(237,233,224,.25); }
+.display { font-family: 'Playfair Display', Georgia, serif; font-size: 66px; line-height: 1.04; letter-spacing: -.02em; margin-bottom: 22px; font-weight: 700; }
+.display em { font-style: italic; color: var(--accent1); }
+.h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 46px; line-height: 1.08; letter-spacing: -.01em; margin-bottom: 24px; font-weight: 700; }
+.h2 em { font-style: italic; color: var(--accent1); } .h2 .n { color: var(--accent3); } .h2 .g { color: var(--success); } .h2 .r { color: var(--danger); }
+.lead { font-size: 19px; line-height: 1.68; color: rgba(13,13,13,.56); max-width: 760px; margin-bottom: 28px; }
+.card { background: #fff; border: 1px solid var(--border); border-top: 2px solid var(--text); padding: 18px 20px; }
+.card .ct { font-size: 10.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.card .cv { font-family: 'Playfair Display', Georgia, serif; font-size: 25px; line-height: 1.2; }
+.card .cs { font-size: 15px; color: #5C5A54; margin-top: 8px; line-height: 1.55; }
+.box { padding: 14px 17px 14px 18px; font-size: 16px; line-height: 1.6; border: none; border-left: 3px solid; }
+.box.n  { border-color: var(--accent3); background: rgba(26,58,107,.04); }
+.box.a  { border-color: var(--accent2); background: rgba(139,105,20,.04); }
+.box.v  { border-color: var(--text);    background: rgba(0,0,0,.03); }
+.box.g  { border-color: var(--success); background: rgba(26,107,60,.04); }
+.box.r  { border-color: var(--danger);  background: rgba(196,25,44,.04); }
+.box.gr { border-color: var(--border);  background: rgba(0,0,0,.02); }
+.dbox { padding: 15px 18px; font-size: 16px; line-height: 1.6; border: none; border-left: 2px solid; }
+.dbox.b { border-color: rgba(200,215,240,.35); background: rgba(200,215,240,.05); color: rgba(237,233,224,.78); }
+.dbox.g { border-color: rgba(80,180,130,.35);  background: rgba(80,180,130,.05);  color: rgba(237,233,224,.78); }
+.dbox.a { border-color: rgba(212,170,50,.4);   background: rgba(212,170,50,.06);  color: rgba(237,233,224,.78); }
+.dbox.r { border-color: rgba(196,25,44,.4);    background: rgba(196,25,44,.06);   color: rgba(237,233,224,.78); }
+.snum { position: absolute; bottom: 22px; right: 30px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: rgba(13,13,13,.16); letter-spacing: .05em; }
+.snum-d { color: rgba(237,233,224,.18) !important; }
+.sfoot { position: absolute; bottom: 19px; left: 30px; z-index: 10; }
+.sfoot span { font-size: 10px; font-weight: 500; letter-spacing: .04em; color: rgba(13,13,13,.26); }
+.sfoot-d span { color: rgba(237,233,224,.22) !important; }
+#progress-bar { width: var(--w); height: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--accent1); transition: width .42s ease; }
+#controls { display: flex; align-items: center; gap: 14px; }
+.btn { width: 38px; height: 38px; border-radius: 2px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); color: #C8C4BC; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.btn:hover { background: rgba(255,255,255,.14); } .btn:disabled { opacity: .25; cursor: default; }
+#counter { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #555550; min-width: 48px; text-align: center; }
+#btn-print { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 2px; background: rgba(196,25,44,.12); border: 1px solid rgba(196,25,44,.28); color: #D4707A; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
+#btn-print:hover { background: rgba(196,25,44,.22); }
+@media print {
+  @page { size: 900px 1125px; margin: 0; }
+  body { background: #1C1C1C !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position: static !important; width: 900px !important; height: 1125px !important; overflow: visible !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+  .slide { position: relative !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; display: flex !important; width: 900px !important; height: 1125px !important; page-break-after: always; break-after: page; overflow: hidden !important; }
+  .slide.exit { display: none !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 01 COVER -->
+  <div class="slide active" id="s1" style="background:url('storm.jpg') center center/cover no-repeat;padding:0;">
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.74) 100%);z-index:0;"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent1);z-index:2;"></div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;height:100%;padding:60px 56px;">
+      <div style="display:inline-flex;font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:4px;width:fit-content;margin-bottom:28px;">Risk · 01/04</div>
+
+      <div style="font-family:'Playfair Display',Georgia,serif;font-size:72px;line-height:1.05;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:20px;">
+        Vol registra<br>o movimento.<br>
+        Não registra<br><em style="font-style:italic;color:#E05565;">a destruição</em>.
+      </div>
+
+      <p style="font-size:17px;line-height:1.65;color:rgba(255,255,255,.48);max-width:640px;">
+        Uma medida de dispersão. Útil em vários contextos. Mas não é risco.
+      </p>
+    </div>
+
+    <div style="position:absolute;bottom:22px;right:30px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(255,255,255,.14);letter-spacing:.05em;z-index:2;">01 / 06</div>
+    <div style="position:absolute;bottom:19px;left:30px;z-index:2;"><span style="font-size:10px;font-weight:500;letter-spacing:.04em;color:rgba(255,255,255,.22);">linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 02 DEFINIÇÃO -->
+  <div class="slide" id="s2">
+    <div class="bar" style="background:var(--accent3)"></div>
+    <div class="tag t-navy">Definição</div>
+    <div class="h2">É o <span class="n">desvio padrão</span> dos retornos, anualizado</div>
+    <p class="lead">Nada mais, nada menos. Mede o quanto os retornos se afastam da média. Não mede direção. Não mede perda permanente.</p>
+
+    <div style="margin-bottom:28px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;">A fórmula</div>
+      <div style="display:inline-flex;padding:14px 22px;border:1.5px solid var(--accent3);background:rgba(26,58,107,.05);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:var(--accent3);">
+        &sigma; = std(r<sub>t</sub>) &times; &radic;252
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:8px;padding-left:4px;letter-spacing:.02em;">
+        r<sub>t</sub> = retorno diário · 252 = dias úteis no ano
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="box n">
+        <strong>O sinal não importa.</strong> Retorno de +2% e de -2% no mesmo período têm a mesma contribuição para vol. A fórmula mede magnitude, não direção.
+      </div>
+      <div class="box a">
+        <strong>Vol de 20% ao ano</strong> significa que, em distribuição normal, 68% dos anos o retorno ficará entre -20% e +20% da média. O problema: retornos financeiros não são normais.
+      </div>
+      <div class="box v">
+        <strong>É um resumo estatístico.</strong> Colapsa toda a distribuição de retornos em um único número. Informação útil, mas incompleta por construção.
+      </div>
+    </div>
+
+    <div class="snum">02 / 06</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 03 REALIZADA VS IMPLÍCITA -->
+  <div class="slide" id="s3">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">Dois tipos</div>
+    <div class="h2">Realizada olha para <em>trás</em>.<br>Implícita olha para <em>frente</em>.</div>
+    <p class="lead">São métricas distintas, usadas em contextos distintos. Confundi-las é comum e caro.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:22px;">
+      <div class="card">
+        <div class="ct">Vol Realizada (HV)</div>
+        <div class="cv">Calculada sobre retornos passados</div>
+        <div class="cs">Desvio padrão de retornos históricos, anualizado. Reflete o que aconteceu. Usada em sizing, backtests e normalização de risco entre ativos.</div>
+      </div>
+      <div class="card" style="border-top-color:var(--accent1);">
+        <div class="ct">Vol Implícita (IV)</div>
+        <div class="cv" style="color:var(--accent1);">Extraída do preço de opções</div>
+        <div class="cs">Representa a expectativa do mercado para volatilidade futura. O VIX é vol implícita do S&P 500 para os próximos 30 dias. Usada em precificação de hedge e leitura de regime.</div>
+      </div>
+    </div>
+
+    <div class="box a" style="font-size:14px;">
+      Quando IV está acima de HV, o mercado espera mais turbulência do que a recente. Hedge fica caro. Quando IV está abaixo de HV, opções estão baratas em relação ao movimento recente. Janela para comprar proteção estrutural.
+    </div>
+
+    <div class="snum">03 / 06</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 04 CAPTURA E NÃO CAPTURA -->
+  <div class="slide" id="s4">
+    <div class="bar" style="background:var(--text)"></div>
+    <div class="tag t-violet" style="color:var(--text);">O que vol mede, o que vol ignora</div>
+    <div class="h2">A mesma ferramenta, <em>dois perfis</em></div>
+    <p class="lead">Conhecer os dois lados define quando vol é a métrica certa e quando ela está faltando metade da resposta.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <div class="box g"><strong>Captura:</strong> magnitude das oscilações em relação a si mesmo ao longo do tempo</div>
+      <div class="box g"><strong>Captura:</strong> custo de opções. Vol implícita é o insumo central do Black-Scholes</div>
+      <div class="box g"><strong>Captura:</strong> base para normalizar risco entre ações, bonds e commodities</div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:4px 0 16px;"></div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="box r"><strong>Ignora:</strong> direção do movimento. Queda de 20% e alta de 20% têm a mesma contribuição</div>
+      <div class="box r"><strong>Ignora:</strong> perda permanente de capital. Ativo que cai 80% e fica lá tem vol baixa depois</div>
+      <div class="box r"><strong>Ignora:</strong> risco de cauda. Assume normalidade. Fat tails são sistematicamente subestimados</div>
+      <div class="box r"><strong>Ignora:</strong> liquidez. Ativos ilíquidos têm poucos negócios e aparecem artificialmente menos voláteis</div>
+    </div>
+
+    <div class="snum">04 / 06</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 05 VOL BAIXA ≠ SEGURO -->
+  <div class="slide" id="s5">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">Armadilha clássica</div>
+    <div class="h2">Vol baixa não é garantia de <em>mercado seguro</em></div>
+    <p class="lead">É sintoma de mercado calmo. São estados diferentes. A história é sistemática a esse respeito.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:22px;">
+      <div class="card">
+        <div class="ct">2006 e 2007</div>
+        <div class="cv">VIX em mínimas históricas</div>
+        <div class="cs">Vol realizada do S&P abaixo de 10% ao ano. O crédito subprime se expandia silenciosamente. A crise de 2008 começou e foi construída debaixo de vol baixa.</div>
+      </div>
+      <div class="card" style="border-top-color:var(--accent2);">
+        <div class="ct">Janeiro e Fevereiro de 2020</div>
+        <div class="cv" style="color:var(--accent2);">Mercados próximos de máximas históricas</div>
+        <div class="cs">VIX entre 12 e 18. Risco de pandemia já se materializava na Ásia. Em semanas o VIX foi de 15 para 85. Vol baixa não era proteção. Era complacência.</div>
+      </div>
+    </div>
+
+    <div class="box v" style="font-size:14px;">
+      Minsky formalizou em 1986: períodos longos de vol baixa geram incentivo para alavancagem. Quanto maior a alavancagem acumulada, mais violenta a reversão quando a vol volta. A calmaria acumula a munição da tempestade.
+    </div>
+
+    <div class="snum">05 / 06</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 06 CLOSE DARK -->
+  <div class="slide slide-dark" id="s6">
+    <div class="bar" style="background:linear-gradient(90deg,var(--accent1),var(--accent3))"></div>
+    <div class="deco" style="width:580px;height:580px;right:-120px;bottom:-180px;border:1px solid rgba(200,215,240,.04)"></div>
+
+    <div style="margin-top:100px;">
+      <div class="tag t-dark">Educativo · 01/04</div>
+      <div class="display" style="color:#EDE9E0;font-size:58px;line-height:1.08;margin-bottom:24px;">
+        Volatilidade é um instrumento.<br>Não confunda o painel com <em style="color:#D4A843;">o avião</em>.
+      </div>
+      <p style="font-size:17px;line-height:1.68;color:rgba(237,233,224,.52);max-width:740px;margin-bottom:40px;">
+        Usada corretamente, é insumo operacional de risco. Usada como definição completa de risco, cria exposições que só aparecem quando já é tarde.
+      </p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:auto;margin-bottom:52px;">
+      <div class="dbox b"><strong>O que é:</strong> desvio padrão de retornos, anualizado</div>
+      <div class="dbox a"><strong>O que não é:</strong> medida completa de risco</div>
+      <div class="dbox g"><strong>Como usar:</strong> sizing, custo de hedge e normalização entre ativos</div>
+    </div>
+
+    <div class="snum snum-d">06 / 06</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:16.67%"></div></div>
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 6</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const fill = document.getElementById('progress-fill');
+const counter = document.getElementById('counter');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const N = slides.length;
+let cur = 0;
+function goTo(n) {
+  slides[cur].classList.remove('active'); slides[cur].classList.add('exit');
+  const prev = cur; cur = n; slides[cur].classList.add('active');
+  setTimeout(() => slides[prev].classList.remove('exit'), 430);
+  counter.textContent = (cur+1)+' / '+N;
+  fill.style.width = ((cur+1)/N*100).toFixed(2)+'%';
+  btnPrev.disabled = cur===0; btnNext.disabled = cur===N-1;
+}
+btnPrev.addEventListener('click', () => { if(cur>0) goTo(cur-1); });
+btnNext.addEventListener('click', () => { if(cur<N-1) goTo(cur+1); });
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') btnNext.click();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') btnPrev.click();
+});
+document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

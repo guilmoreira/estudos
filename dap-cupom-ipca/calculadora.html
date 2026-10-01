@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora DAP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F7F7F5;
+  --ink: #1F1F1F;
+  --t1: rgba(31,31,31,.86);
+  --mute: #6B6B69;
+  --line: #DEDEDA;
+  --field: #FCFCFA;
+  --accent: #BE2B2B;
+  --pos: #1A6B3C;
+  --hand: 'Permanent Marker', cursive;
+  --mono: 'Space Mono', monospace;
+}
+html, body { background: var(--bg); }
+body { color: var(--ink); font-family: var(--mono); font-size: 15px; line-height: 1.6; }
+
+/* papel: retícula offset + grão por cima de tudo */
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 50; box-shadow: inset 0 0 160px rgba(80,80,80,.10); }
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 51; mix-blend-mode: multiply; opacity: .34;
+  background-image:
+    radial-gradient(rgba(0,0,0,.09) .9px, transparent 1.25px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 5px 5px, 260px 260px;
+}
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 56px 24px 80px; }
+h1 { font-family: var(--hand); font-weight: 400; font-size: 72px; line-height: 1.02; transform: rotate(-2deg); transform-origin: left; margin-bottom: 22px; text-shadow: 0 0 .6px currentColor; }
+.hl { display: inline-block; background: var(--accent); color: #F9F9F7; padding: 0 .14em; }
+header p { color: var(--t1); max-width: 680px; }
+
+section { border-top: 1px solid var(--line); padding: 44px 0 40px; }
+h2 { font-family: var(--hand); font-weight: 400; font-size: 40px; line-height: 1.05; margin-bottom: 10px; text-shadow: 0 0 .6px currentColor; }
+h2 .n { color: var(--accent); margin-right: 12px; }
+.sub { color: var(--t1); margin-bottom: 26px; max-width: 720px; }
+
+label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+input[type=text], input[type=date], select {
+  background: var(--field); color: var(--ink); border: 1px solid #CFCFCA; border-radius: 0;
+  font-family: var(--mono); font-size: 16px; padding: 9px 11px; width: 100%; font-variant-numeric: tabular-nums;
+}
+input:focus, select:focus { outline: none; border-color: var(--ink); }
+input[type=range] { width: 100%; accent-color: var(--accent); margin: 6px 0 2px; }
+.fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 760px; }
+.slider { max-width: 760px; margin-bottom: 22px; }
+.slider .top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.slider .val { font-family: var(--hand); font-size: 34px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.slider .scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--mute); }
+.seg { display: inline-flex; border: 1px solid var(--ink); }
+.seg button { background: transparent; color: var(--ink); border: 0; padding: 9px 14px; font-family: var(--mono); font-size: 13px; cursor: pointer; }
+.seg button.on { background: var(--ink); color: var(--bg); font-weight: 700; }
+.src-links { font-size: 13px; color: var(--mute); margin-top: 14px; }
+a { color: var(--ink); text-underline-offset: 3px; }
+
+/* cadeia taxa -> R$ */
+.chain { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 8px 0 18px; }
+.step { border: 1.5px solid var(--ink); padding: 16px 16px 14px; position: relative; background: var(--field); }
+.step + .step { margin-left: 26px; }
+.step + .step::before { content: '→'; position: absolute; left: -24px; top: 38%; font-size: 20px; color: var(--mute); }
+.step .l { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+.step .v { font-family: var(--hand); font-size: 30px; line-height: 1.15; margin: 6px 0 6px; white-space: nowrap; }
+.step .f { font-size: 12px; color: var(--mute); line-height: 1.45; word-break: break-word; }
+.step.last { border-color: var(--accent); }
+.step.last .v { color: var(--accent); }
+
+.say { font-size: 17px; line-height: 1.6; max-width: 760px; margin: 6px 0 0; }
+.say b { font-weight: 700; }
+.big { font-family: var(--hand); font-size: 60px; line-height: 1.05; margin: 4px 0 10px; font-variant-numeric: tabular-nums; }
+.neg { color: var(--accent); }
+.pos { color: var(--pos); }
+.hint { margin-top: 18px; padding: 12px 16px; border-left: 3px solid var(--accent); color: var(--t1); font-size: 14px; max-width: 760px; background: rgba(255,255,255,.45); }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+svg.chart { display: block; width: 100%; height: auto; }
+
+.bars { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 16px; max-width: 760px; }
+.brow { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; font-size: 13px; }
+.brow .lb { color: var(--mute); }
+.bar { height: 38px; display: flex; align-items: center; padding: 0 12px; white-space: nowrap; overflow: visible; font-weight: 700; border: 1.5px solid var(--ink); min-width: 4px; }
+.bar.red { border-color: var(--accent); color: var(--accent); background: repeating-linear-gradient(135deg, rgba(190,43,43,.22) 0 2px, transparent 2px 8px); }
+.bar.ghost { border-style: dashed; color: var(--mute); border-color: var(--mute); }
+.split { display: flex; gap: 6px; }
+
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); align-items: baseline; max-width: 760px; font-size: 14px; }
+.kv .k { color: var(--t1); }
+.kv .v { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+
+.links { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 36px; max-width: 860px; }
+.links a { display: block; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+.links a b { display: block; font-weight: 700; }
+.links a span { color: var(--mute); font-size: 13px; }
+.links a:hover b { text-decoration: underline; }
+
+footer { border-top: 1px solid var(--line); padding-top: 24px; color: var(--mute); font-size: 13px; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 36px 16px 60px; }
+  h1 { font-size: 50px; }
+  h2 { font-size: 32px; }
+  .fields { grid-template-columns: minmax(0, 1fr); }
+  .chain { grid-template-columns: minmax(0, 1fr); }
+  .step + .step { margin: 22px 0 0; }
+  .step + .step::before { content: '↓'; left: 16px; top: -24px; }
+  .two { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .links { grid-template-columns: minmax(0, 1fr); }
+  .brow { grid-template-columns: 1fr; gap: 4px; }
+  .big { font-size: 46px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Calculadora<br><span class="hl">DAP</span></h1>
+  <p>Mexa nos controles e veja a conta acontecer. Cinco passos: preço, choque de taxa, hedge de NTN-B, IPCA+ sintético e inflação implícita. Os valores iniciais são os da curva de 10/08/2026 usados no post.</p>
+</header>
+
+<!-- 0 -->
+<section id="base">
+  <h2><span class="n">0</span>O IPCA que corrige o contrato</h2>
+  <p class="sub">Todo DAP é corrigido pelo IPCA acumulado, o VNA. Ele parte do número-índice do IBGE e anda pela projeção da ANBIMA até hoje.</p>
+  <div class="fields">
+    <label>Data<input type="date" id="g-ref" value="2026-08-10"></label>
+    <label>Número-índice IPCA<input type="text" inputmode="decimal" id="g-ni" value="7652,37"></label>
+    <label>Projeção ANBIMA % mês<input type="text" inputmode="decimal" id="g-proj" value="0,05"></label>
+  </div>
+  <p class="say" id="g-out" style="margin-top:18px;"></p>
+  <p class="src-links">Onde pegar: <a href="https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html" target="_blank" rel="noopener">IPCA no IBGE</a> e <a href="https://www.anbima.com.br/pt_br/informar/estatisticas/precos-e-indices/projecao-de-inflacao-gp-m.htm" target="_blank" rel="noopener">projeção na ANBIMA</a>.</p>
+</section>
+
+<!-- 1 -->
+<section id="preco">
+  <h2><span class="n">1</span>Da taxa ao real</h2>
+  <p class="sub">Escolha o vencimento e arraste a taxa. A taxa vira PU, o PU é multiplicado pelo VNA, e sai o valor de um contrato.</p>
+  <div class="fields" style="grid-template-columns: minmax(0, 260px); margin-bottom: 18px;">
+    <label>Contrato<select id="c-code"></select></label>
+  </div>
+  <div class="slider">
+    <label><span class="top"><span>Taxa negociada, % a.a.</span><span class="val" id="c-rate-v"></span></span>
+      <input type="range" id="c-rate" min="4" max="12" step="0.01" value="7.98"></label>
+    <div class="scale"><span>4%</span><span>8%</span><span>12%</span></div>
+  </div>
+  <div class="chain" id="c-chain"></div>
+  <div class="two">
+    <div>
+      <p class="say" id="c-say"></p>
+      <div class="hint">Taxa sobe, PU cai. Por isso <b>comprado em taxa é vendido em PU</b>. A curva ao lado mostra a relação.</div>
+    </div>
+    <svg class="chart" id="c-chart" viewBox="0 0 460 260"></svg>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="choque">
+  <h2><span class="n">2</span>E se a taxa mexer?</h2>
+  <p class="sub">Escolha o lado e o tamanho. Depois arraste o choque e veja o resultado no contrato do passo 1.</p>
+  <div style="display:flex; flex-wrap:wrap; gap:16px 24px; align-items:end; margin-bottom:22px;">
+    <div class="seg" id="s-side"><button data-v="1" class="on">vendido em taxa</button><button data-v="-1">comprado em taxa</button></div>
+    <label style="width:160px;">Contratos<input type="text" inputmode="decimal" id="s-q" value="100"></label>
+  </div>
+  <div class="slider">
+    <label><span class="top"><span>Choque na taxa</span><span class="val" id="s-shock-v"></span></span>
+      <input type="range" id="s-shock" min="-150" max="150" step="5" value="-50"></label>
+    <div class="scale"><span>−150 bps</span><span>0</span><span>+150 bps</span></div>
+  </div>
+  <div class="big" id="s-big"></div>
+  <p class="say" id="s-say"></p>
+</section>
+
+<!-- 3 -->
+<section id="hedge">
+  <h2><span class="n">3</span>Hedge de NTN-B</h2>
+  <p class="sub">Você tem NTN-B e quer tirar o risco de juro real sem vender o título. Quantos DAP comprar em taxa?</p>
+  <div class="fields">
+    <label>NTN-B<select id="h-mat"></select></label>
+    <label>Financeiro R$<input type="text" inputmode="decimal" id="h-mv" value="10.000.000"></label>
+    <label>Taxa NTN-B % a.a.<input type="text" inputmode="decimal" id="h-y" value="7,98"></label>
+  </div>
+  <div class="big" id="h-big" style="margin-top:26px;"></div>
+  <div class="bars" id="h-bars"></div>
+  <p class="say" id="h-say"></p>
+  <div class="hint">O hedge é por DV01, não por financeiro. A NTN-B paga cupom de 6% ao ano e tem duration menor que a do DAP, que não paga nada até o vencimento.</div>
+</section>
+
+<!-- 4 -->
+<section id="sint">
+  <h2><span class="n">4</span>LFT vira IPCA+</h2>
+  <p class="sub">Você tem caixa rendendo CDI e quer juro real sem vender nada. Venda DAP em taxa: o CDI se cancela e sobra IPCA mais a taxa do contrato do passo 1.</p>
+  <div class="fields" style="grid-template-columns: minmax(0, 260px);">
+    <label>Caixa em LFT R$<input type="text" inputmode="decimal" id="l-mv" value="10.000.000"></label>
+  </div>
+  <div class="big" id="l-big" style="margin-top:26px;"></div>
+  <p class="say" id="l-say"></p>
+</section>
+
+<!-- 5 -->
+<section id="impl">
+  <h2><span class="n">5</span>A inflação que está no preço</h2>
+  <p class="sub">Juro pré dividido por juro real dá a inflação implícita. Arraste a taxa pré do mesmo vencimento do contrato do passo 1.</p>
+  <div class="slider">
+    <label><span class="top"><span>DI1 pré no vencimento, % a.a.</span><span class="val" id="i-pre-v"></span></span>
+      <input type="range" id="i-pre" min="8" max="18" step="0.0025" value="14.5175"></label>
+    <div class="scale"><span>8%</span><span>13%</span><span>18%</span></div>
+  </div>
+  <div class="big" id="i-big"></div>
+  <div class="bars" id="i-bars"></div>
+  <div class="hint">O DI1 vence no dia 1 e o DAP no dia 15. Para comparar certo, interpole a taxa pré entre os dois DI1 em volta do vencimento. Os 14,52% do exemplo já estão interpolados.</div>
+</section>
+
+<!-- links -->
+<section id="fontes">
+  <h2><span class="n">+</span>Onde ver os preços</h2>
+  <div class="links">
+    <a href="https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm" target="_blank" rel="noopener"><b>Tesouro Direto</b><span>preços e taxas do Tesouro IPCA+ e Selic, ao varejo</span></a>
+    <a href="https://www.anbima.com.br/pt_br/informar/taxas-de-titulos-publicos.htm" target="_blank" rel="noopener"><b>ANBIMA, títulos públicos</b><span>taxas indicativas de NTN-B no secundário</span></a>
+    <a href="https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/historico/derivativos/ajustes-do-pregao/" target="_blank" rel="noopener"><b>B3, ajustes do pregão</b><span>DAP e DI1, taxa e PU de ajuste do dia</span></a>
+    <a href="https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html" target="_blank" rel="noopener"><b>IBGE, IPCA</b><span>número-índice mensal</span></a>
+    <a href="https://www.anbima.com.br/pt_br/informar/estatisticas/precos-e-indices/projecao-de-inflacao-gp-m.htm" target="_blank" rel="noopener"><b>ANBIMA, projeção de IPCA</b><span>usada no VNA entre um dia 15 e outro</span></a>
+  </div>
+</section>
+
+<footer>
+  Fontes: B3, Guia do Contrato Futuro de Cupom de IPCA (DAP); ANBIMA e Tesouro Nacional, metodologias de títulos públicos. Curva de 10/08/2026. Calendário de feriados da B3 embutido. Ferramenta educativa, não é recomendação de investimento.<br>
+  <a href="https://linkedin.com/in/guilmoreira">linkedin.com/in/guilmoreira</a>
+</footer>
+</div>
+
+<script>
+const HOLIDAYS = new Set(["2020-01-01","2020-02-24","2020-02-25","2020-04-10","2020-04-21","2020-05-01","2020-06-11","2020-09-07","2020-10-12","2020-11-02","2020-11-15","2020-12-25","2021-01-01","2021-02-15","2021-02-16","2021-04-02","2021-04-21","2021-05-01","2021-06-03","2021-09-07","2021-10-12","2021-11-02","2021-11-15","2021-12-25","2022-01-01","2022-02-28","2022-03-01","2022-04-15","2022-04-21","2022-05-01","2022-06-16","2022-09-07","2022-10-12","2022-11-02","2022-11-15","2022-12-25","2023-01-01","2023-02-20","2023-02-21","2023-04-07","2023-04-21","2023-05-01","2023-06-08","2023-09-07","2023-10-12","2023-11-02","2023-11-15","2023-12-25","2024-01-01","2024-02-12","2024-02-13","2024-03-29","2024-04-21","2024-05-01","2024-05-30","2024-09-07","2024-10-12","2024-11-02","2024-11-15","2024-11-20","2024-12-25","2025-01-01","2025-03-03","2025-03-04","2025-04-18","2025-04-21","2025-05-01","2025-06-19","2025-09-07","2025-10-12","2025-11-02","2025-11-15","2025-11-20","2025-12-25","2026-01-01","2026-02-16","2026-02-17","2026-04-03","2026-04-21","2026-05-01","2026-06-04","2026-09-07","2026-10-12","2026-11-02","2026-11-15","2026-11-20","2026-12-25","2027-01-01","2027-02-08","2027-02-09","2027-03-26","2027-04-21","2027-05-01","2027-05-27","2027-09-07","2027-10-12","2027-11-02","2027-11-15","2027-11-20","2027-12-25","2028-01-01","2028-02-28","2028-02-29","2028-04-14","2028-04-21","2028-05-01","2028-06-15","2028-09-07","2028-10-12","2028-11-02","2028-11-15","2028-11-20","2028-12-25","2029-01-01","2029-02-12","2029-02-13","2029-03-30","2029-04-21","2029-05-01","2029-05-31","2029-09-07","2029-10-12","2029-11-02","2029-11-15","2029-11-20","2029-12-25","2030-01-01","2030-03-04","2030-03-05","2030-04-19","2030-04-21","2030-05-01","2030-06-20","2030-09-07","2030-10-12","2030-11-02","2030-11-15","2030-11-20","2030-12-25","2031-01-01","2031-02-24","2031-02-25","2031-04-11","2031-04-21","2031-05-01","2031-06-12","2031-09-07","2031-10-12","2031-11-02","2031-11-15","2031-11-20","2031-12-25","2032-01-01","2032-02-09","2032-02-10","2032-03-26","2032-04-21","2032-05-01","2032-05-27","2032-09-07","2032-10-12","2032-11-02","2032-11-15","2032-11-20","2032-12-25","2033-01-01","2033-02-28","2033-03-01","2033-04-15","2033-04-21","2033-05-01","2033-06-16","2033-09-07","2033-10-12","2033-11-02","2033-11-15","2033-11-20","2033-12-25","2034-01-01","2034-02-20","2034-02-21","2034-04-07","2034-04-21","2034-05-01","2034-06-08","2034-09-07","2034-10-12","2034-11-02","2034-11-15","2034-11-20","2034-12-25","2035-01-01","2035-02-05","2035-02-06","2035-03-23","2035-04-21","2035-05-01","2035-05-24","2035-09-07","2035-10-12","2035-11-02","2035-11-15","2035-11-20","2035-12-25","2036-01-01","2036-02-25","2036-02-26","2036-04-11","2036-04-21","2036-05-01","2036-06-12","2036-09-07","2036-10-12","2036-11-02","2036-11-15","2036-11-20","2036-12-25","2037-01-01","2037-02-16","2037-02-17","2037-04-03","2037-04-21","2037-05-01","2037-06-04","2037-09-07","2037-10-12","2037-11-02","2037-11-15","2037-11-20","2037-12-25","2038-01-01","2038-03-08","2038-03-09","2038-04-21","2038-04-23","2038-05-01","2038-06-24","2038-09-07","2038-10-12","2038-11-02","2038-11-15","2038-11-20","2038-12-25","2039-01-01","2039-02-21","2039-02-22","2039-04-08","2039-04-21","2039-05-01","2039-06-09","2039-09-07","2039-10-12","2039-11-02","2039-11-15","2039-11-20","2039-12-25","2040-01-01","2040-02-13","2040-02-14","2040-03-30","2040-04-21","2040-05-01","2040-05-31","2040-09-07","2040-10-12","2040-11-02","2040-11-15","2040-11-20","2040-12-25","2041-01-01","2041-03-04","2041-03-05","2041-04-19","2041-04-21","2041-05-01","2041-06-20","2041-09-07","2041-10-12","2041-11-02","2041-11-15","2041-11-20","2041-12-25","2042-01-01","2042-02-17","2042-02-18","2042-04-04","2042-04-21","2042-05-01","2042-06-05","2042-09-07","2042-10-12","2042-11-02","2042-11-15","2042-11-20","2042-12-25","2043-01-01","2043-02-09","2043-02-10","2043-03-27","2043-04-21","2043-05-01","2043-05-28","2043-09-07","2043-10-12","2043-11-02","2043-11-15","2043-11-20","2043-12-25","2044-01-01","2044-02-29","2044-03-01","2044-04-15","2044-04-21","2044-05-01","2044-06-16","2044-09-07","2044-10-12","2044-11-02","2044-11-15","2044-11-20","2044-12-25","2045-01-01","2045-02-20","2045-02-21","2045-04-07","2045-04-21","2045-05-01","2045-06-08","2045-09-07","2045-10-12","2045-11-02","2045-11-15","2045-11-20","2045-12-25","2046-01-01","2046-02-05","2046-02-06","2046-03-23","2046-04-21","2046-05-01","2046-05-24","2046-09-07","2046-10-12","2046-11-02","2046-11-15","2046-11-20","2046-12-25","2047-01-01","2047-02-25","2047-02-26","2047-04-12","2047-04-21","2047-05-01","2047-06-13","2047-09-07","2047-10-12","2047-11-02","2047-11-15","2047-11-20","2047-12-25","2048-01-01","2048-02-17","2048-02-18","2048-04-03","2048-04-21","2048-05-01","2048-06-04","2048-09-07","2048-10-12","2048-11-02","2048-11-15","2048-11-20","2048-12-25","2049-01-01","2049-03-01","2049-03-02","2049-04-16","2049-04-21","2049-05-01","2049-06-17","2049-09-07","2049-10-12","2049-11-02","2049-11-15","2049-11-20","2049-12-25","2050-01-01","2050-02-21","2050-02-22","2050-04-08","2050-04-21","2050-05-01","2050-06-09","2050-09-07","2050-10-12","2050-11-02","2050-11-15","2050-11-20","2050-12-25","2051-01-01","2051-02-13","2051-02-14","2051-03-31","2051-04-21","2051-05-01","2051-06-01","2051-09-07","2051-10-12","2051-11-02","2051-11-15","2051-11-20","2051-12-25","2052-01-01","2052-03-04","2052-03-05","2052-04-19","2052-04-21","2052-05-01","2052-06-20","2052-09-07","2052-10-12","2052-11-02","2052-11-15","2052-11-20","2052-12-25","2053-01-01","2053-02-17","2053-02-18","2053-04-04","2053-04-21","2053-05-01","2053-06-05","2053-09-07","2053-10-12","2053-11-02","2053-11-15","2053-11-20","2053-12-25","2054-01-01","2054-02-09","2054-02-10","2054-03-27","2054-04-21","2054-05-01","2054-05-28","2054-09-07","2054-10-12","2054-11-02","2054-11-15","2054-11-20","2054-12-25","2055-01-01","2055-03-01","2055-03-02","2055-04-16","2055-04-21","2055-05-01","2055-06-17","2055-09-07","2055-10-12","2055-11-02","2055-11-15","2055-11-20","2055-12-25","2056-01-01","2056-02-14","2056-02-15","2056-03-31","2056-04-21","2056-05-01","2056-06-01","2056-09-07","2056-10-12","2056-11-02","2056-11-15","2056-11-20","2056-12-25","2057-01-01","2057-03-05","2057-03-06","2057-04-20","2057-04-21","2057-05-01","2057-06-21","2057-09-07","2057-10-12","2057-11-02","2057-11-15","2057-11-20","2057-12-25","2058-01-01","2058-02-25","2058-02-26","2058-04-12","2058-04-21","2058-05-01","2058-06-13","2058-09-07","2058-10-12","2058-11-02","2058-11-15","2058-11-20","2058-12-25","2059-01-01","2059-02-10","2059-02-11","2059-03-28","2059-04-21","2059-05-01","2059-05-29","2059-09-07","2059-10-12","2059-11-02","2059-11-15","2059-11-20","2059-12-25","2060-01-01","2060-03-01","2060-03-02","2060-04-16","2060-04-21","2060-05-01","2060-06-17","2060-09-07","2060-10-12","2060-11-02","2060-11-15","2060-11-20","2060-12-25","2061-01-01","2061-02-21","2061-02-22","2061-04-08","2061-04-21","2061-05-01","2061-06-09","2061-09-07","2061-10-12","2061-11-02","2061-11-15","2061-11-20","2061-12-25","2062-01-01","2062-02-06","2062-02-07","2062-03-24","2062-04-21","2062-05-01","2062-05-25","2062-09-07","2062-10-12","2062-11-02","2062-11-15","2062-11-20","2062-12-25","2063-01-01","2063-02-26","2063-02-27","2063-04-13","2063-04-21","2063-05-01","2063-06-14","2063-09-07","2063-10-12","2063-11-02","2063-11-15","2063-11-20","2063-12-25","2064-01-01","2064-02-18","2064-02-19","2064-04-04","2064-04-21","2064-05-01","2064-06-05","2064-09-07","2064-10-12","2064-11-02","2064-11-15","2064-11-20","2064-12-25","2065-01-01","2065-02-09","2065-02-10","2065-03-27","2065-04-21","2065-05-01","2065-05-28","2065-09-07","2065-10-12","2065-11-02","2065-11-15","2065-11-20","2065-12-25","2066-01-01","2066-02-22","2066-02-23","2066-04-09","2066-04-21","2066-05-01","2066-06-10","2066-09-07","2066-10-12","2066-11-02","2066-11-15","2066-11-20","2066-12-25","2067-01-01","2067-02-14","2067-02-15","2067-04-01","2067-04-21","2067-05-01","2067-06-02","2067-09-07","2067-10-12","2067-11-02","2067-11-15","2067-11-20","2067-12-25","2068-01-01","2068-03-05","2068-03-06","2068-04-20","2068-04-21","2068-05-01","2068-06-21","2068-09-07","2068-10-12","2068-11-02","2068-11-15","2068-11-20","2068-12-25","2069-01-01","2069-02-25","2069-02-26","2069-04-12","2069-04-21","2069-05-01","2069-06-13","2069-09-07","2069-10-12","2069-11-02","2069-11-15","2069-11-20","2069-12-25","2070-01-01","2070-02-10","2070-02-11","2070-03-28","2070-04-21","2070-05-01","2070-05-29","2070-09-07","2070-10-12","2070-11-02","2070-11-15","2070-11-20","2070-12-25","2071-01-01","2071-03-02","2071-03-03","2071-04-17","2071-04-21","2071-05-01","2071-06-18","2071-09-07","2071-10-12","2071-11-02","2071-11-15","2071-11-20","2071-12-25","2072-01-01","2072-02-22","2072-02-23","2072-04-08","2072-04-21","2072-05-01","2072-06-09","2072-09-07","2072-10-12","2072-11-02","2072-11-15","2072-11-20","2072-12-25","2073-01-01","2073-02-06","2073-02-07","2073-03-24","2073-04-21","2073-05-01","2073-05-25","2073-09-07","2073-10-12","2073-11-02","2073-11-15","2073-11-20","2073-12-25","2074-01-01","2074-02-26","2074-02-27","2074-04-13","2074-04-21","2074-05-01","2074-06-14","2074-09-07","2074-10-12","2074-11-02","2074-11-15","2074-11-20","2074-12-25","2075-01-01","2075-02-18","2075-02-19","2075-04-05","2075-04-21","2075-05-01","2075-06-06","2075-09-07","2075-10-12","2075-11-02","2075-11-15","2075-11-20","2075-12-25"]);
+const MONTHS = { F: 1, G: 2, H: 3, J: 4, K: 5, M: 6, N: 7, Q: 8, U: 9, V: 10, X: 11, Z: 12 };
+const MNAME = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const PT = 0.00025;
+const CURVE = { DAPQ28: 8.33, DAPK29: 8.16, DAPK31: 8.175, DAPQ32: 8.145, DAPK33: 8.11, DAPK35: 7.98,
+                DAPK37: 7.79, DAPQ40: 7.71, DAPK45: 7.56, DAPQ50: 7.52, DAPK55: 7.42, DAPQ60: 7.42 };
+const NTNB = ['2028-08-15', '2029-05-15', '2032-08-15', '2033-05-15', '2035-05-15', '2040-08-15', '2045-05-15', '2050-08-15', '2055-05-15', '2060-08-15'];
+const $ = id => document.getElementById(id);
+
+const num = s => {
+  s = String(s).trim().replace(/\s/g, '');
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
+  return parseFloat(s);
+};
+const fmt = (v, d = 2) => isFinite(v) ? v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }) : '-';
+const brl = (v, d = 2) => isFinite(v) ? 'R$ ' + fmt(v, d) : '-';
+const signed = (v, d = 0) => !isFinite(v) ? '-' : `<span class="${v < 0 ? 'neg' : 'pos'}">${v < 0 ? '−' : '+'}R$ ${fmt(Math.abs(v), d)}</span>`;
+
+/* calendário */
+const D = s => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const iso = dt => dt.toISOString().slice(0, 10);
+const isBD = dt => { const w = dt.getUTCDay(); return w !== 0 && w !== 6 && !HOLIDAYS.has(iso(dt)); };
+const addDays = (dt, n) => new Date(dt.getTime() + n * 864e5);
+const rollFwd = s => { let dt = D(s); while (!isBD(dt)) dt = addDays(dt, 1); return iso(dt); };
+function du(a, b) {
+  let dt = D(a), end = D(b), n = 0;
+  while (dt < end) { if (isBD(dt)) n++; dt = addDays(dt, 1); }
+  return n;
+}
+const brDate = s => s.split('-').reverse().join('/');
+const monYear = s => MNAME[Number(s.slice(5, 7)) - 1] + '/' + s.slice(2, 4);
+const codeMat = code => { const m = code.match(/^DAP([FGHJKMNQUVXZ])(\d{2})$/); return rollFwd(`20${m[2]}-${String(MONTHS[m[1]]).padStart(2, '0')}-15`); };
+const codeOf = mat => 'DAP' + Object.keys(MONTHS).find(k => MONTHS[k] === Number(mat.slice(5, 7))) + mat.slice(2, 4);
+
+/* preço */
+const pu = (i, n) => 1e5 / Math.pow(1 + i, n / 252);
+function base() {
+  const ref = $('g-ref').value;
+  const r = D(ref), y = r.getUTCFullYear(), m = r.getUTCMonth(), d = r.getUTCDate();
+  const prev = new Date(Date.UTC(y, d >= 15 ? m : m - 1, 15));
+  const next = new Date(Date.UTC(prev.getUTCFullYear(), prev.getUTCMonth() + 1, 15));
+  const dup = du(iso(prev), ref), dut = du(iso(prev), iso(next));
+  const ni = num($('g-ni').value), proj = num($('g-proj').value) / 100;
+  const niMonth = new Date(Date.UTC(prev.getUTCFullYear(), prev.getUTCMonth() - 1, 1));
+  return { ref, prev: iso(prev), dup, dut, ni, proj, vna: ni * Math.pow(1 + proj, dup / dut), niLabel: MNAME[niMonth.getUTCMonth()] + '/' + niMonth.getUTCFullYear() };
+}
+function contract(code, ratePct, B) {
+  const mat = codeMat(code), i = ratePct / 100, n = du(B.ref, mat);
+  const P = pu(i, n), val = P * PT * B.vna;
+  return { code, mat, i, n, P, val, dv01: (P - pu(i + 1e-4, n)) * PT * B.vna, mdur: (n / 252) / (1 + i) };
+}
+
+/* NTN-B */
+const CPN = Math.pow(1.06, 0.5) - 1;
+function ntnbFlows(mat, ref) {
+  const [my, mm] = mat.split('-').map(Number), out = [];
+  for (let k = 0; ; k++) {
+    const s = iso(new Date(Date.UTC(my, mm - 1 - 6 * k, 15)));
+    if (s <= ref) break;
+    out.push({ n: du(ref, rollFwd(s)), cf: CPN + (k === 0 ? 1 : 0) });
+  }
+  return out;
+}
+const ntnbPrice = (flows, y) => flows.reduce((a, f) => a + f.cf / Math.pow(1 + y, f.n / 252), 0);
+
+/* render */
+function renderBase(B) {
+  $('g-out').innerHTML = `VNA de hoje: <b>${fmt(B.vna, 2)}</b>. É o índice de ${B.niLabel} andando ${B.dup} de ${B.dut} dias úteis pela projeção de ${fmt(B.proj * 100, 2)}% no mês.`;
+}
+
+function renderPrice(B, c) {
+  $('c-rate-v').textContent = fmt(c.i * 100, 2) + '%';
+  $('c-chain').innerHTML = `
+    <div class="step"><div class="l">1. taxa</div><div class="v">${fmt(c.i * 100, 2)}%</div><div class="f">ao ano, base 252, negociada na B3</div></div>
+    <div class="step"><div class="l">2. PU</div><div class="v">${fmt(c.P, 2)}</div><div class="f">100.000 / ${fmt(1 + c.i, 4)}^(${c.n}/252)</div></div>
+    <div class="step"><div class="l">3. VNA</div><div class="v">${fmt(B.vna, 2)}</div><div class="f">IPCA acumulado, passo 0</div></div>
+    <div class="step last"><div class="l">4. 1 contrato</div><div class="v">${brl(c.val, 0)}</div><div class="f">PU × 0,00025 × VNA</div></div>`;
+  $('c-say').innerHTML = `O ${c.code} vence em <b>${brDate(c.mat)}</b>, daqui a ${fmt(c.n, 0)} dias úteis. Se a taxa subir 1 bp, cada contrato vale <b>${brl(c.dv01)}</b> a menos. Esse é o DV01, o número que dimensiona hedge e limite de risco.`;
+
+  const L = 54, R = 446, T = 14, Bt = 220, lo = .04, hi = .12;
+  const pMax = pu(lo, c.n), pMin = pu(hi, c.n);
+  const X = i => L + (i - lo) / (hi - lo) * (R - L), Y = p => Bt - (p - pMin) / (pMax - pMin) * (Bt - T);
+  let d = ''; for (let i = lo; i <= hi + 1e-9; i += .002) d += (d ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(pu(i, c.n)).toFixed(1);
+  const t = (x, y, s, a = 'middle') => `<text x="${x}" y="${y}" text-anchor="${a}" fill="#6B6B69" font-size="12" font-family="Space Mono">${s}</text>`;
+  $('c-chart').innerHTML = `
+    <line x1="${L}" y1="${Bt}" x2="${R}" y2="${Bt}" stroke="#6B6B69"/><line x1="${L}" y1="${T}" x2="${L}" y2="${Bt}" stroke="#6B6B69"/>
+    <path d="${d}" fill="none" stroke="#1F1F1F" stroke-width="2.5"/>
+    <line x1="${X(c.i)}" y1="${Y(c.P)}" x2="${X(c.i)}" y2="${Bt}" stroke="#BE2B2B" stroke-dasharray="4 4"/>
+    <line x1="${L}" y1="${Y(c.P)}" x2="${X(c.i)}" y2="${Y(c.P)}" stroke="#BE2B2B" stroke-dasharray="4 4"/>
+    <circle cx="${X(c.i)}" cy="${Y(c.P)}" r="7" fill="#BE2B2B"/>
+    <text x="${X(c.i) + 12}" y="${Y(c.P) - 10}" fill="#BE2B2B" font-size="19" font-family="Permanent Marker">${fmt(c.P / 1000, 1)}k pts</text>
+    ${[.04, .06, .08, .10, .12].map(i => t(X(i), Bt + 20, fmt(i * 100, 0) + '%')).join('')}
+    ${t(R, Bt + 40, 'taxa', 'end')}${t(L + 6, T + 4, 'PU', 'start')}`;
+}
+
+function renderShock(B, c) {
+  const side = Number(document.querySelector('#s-side .on').dataset.v), q = num($('s-q').value), s = Number($('s-shock').value);
+  $('s-shock-v').textContent = (s > 0 ? '+' : s < 0 ? '−' : '') + Math.abs(s) + ' bps';
+  const pnl = sh => side * (pu(c.i + sh / 1e4, c.n) - c.P) * PT * B.vna * q;
+  const v = pnl(s), vOpp = pnl(-s);
+  $('s-big').innerHTML = s === 0 ? '<span style="color:var(--mute)">R$ 0</span>' : signed(v);
+  const lado = side > 0 ? 'Vendido em taxa' : 'Comprado em taxa';
+  const ganha = side > 0 ? 'ganha quando a taxa cai' : 'ganha quando a taxa sobe';
+  $('s-say').innerHTML = s === 0
+    ? `${lado} ${ganha}. Arraste o choque.`
+    : `A taxa do ${c.code} vai de ${fmt(c.i * 100, 2)}% para ${fmt(c.i * 100 + s / 100, 2)}%. ${lado} ${ganha}, então ${v >= 0 ? 'ganha' : 'perde'} <b>${brl(Math.abs(v), 0)}</b> em ${fmt(q, 0)} contratos.<br>O choque contrário daria ${signed(vOpp)}. Os dois não são iguais porque a curva de PU é convexa.`;
+}
+
+function renderHedge(B) {
+  const mat = $('h-mat').value, code = codeOf(mat), y = num($('h-y').value) / 100, mv = num($('h-mv').value);
+  const c = contract(code, CURVE[code], B), flows = ntnbFlows(mat, B.ref);
+  const p0 = ntnbPrice(flows, y), p1 = ntnbPrice(flows, y + 1e-4);
+  const dvB = mv * (p0 - p1) / p0, mdB = (p0 - p1) / p0 * 1e4;
+  const qDv = Math.round(dvB / c.dv01), qN = Math.round(mv / c.val), casado = (y - c.i) * 1e4;
+  $('h-big').innerHTML = `${fmt(qDv, 0)} <span style="font-size:.5em">${code} comprados em taxa</span>`;
+  const w = k => (k / Math.max(qN, qDv) * 100).toFixed(1) + '%';
+  $('h-bars').innerHTML = `
+    <div class="brow"><div class="lb">pelo financeiro</div><div class="bar ghost" style="width:${w(qN)}">${qN}, errado</div></div>
+    <div class="brow"><div class="lb">pelo DV01</div><div class="bar red" style="width:${w(qDv)}">${qDv}, certo</div></div>`;
+  $('h-say').innerHTML = `A carteira perde <b>${brl(dvB, 0)}</b> a cada 1 bp de alta do juro real. Cada ${code} comprado em taxa compensa <b>${brl(c.dv01)}</b>. ${fmt(dvB, 0)} ÷ ${fmt(c.dv01)} = ${qDv}.<br>
+    Duration da NTN-B: ${fmt(mdB, 1)}. Do DAP: ${fmt(c.mdur, 1)}. Com ${qN} contratos, sobram ${qN - qDv} de hedge e a carteira passa a ganhar quando o juro real sobe.<br>
+    Depois do hedge, a carteira rende <b>CDI ${casado >= 0 ? '+' : '−'} ${fmt(Math.abs(casado), 0)} bps</b> de casado (taxa da NTN-B menos taxa do DAP, a ${fmt(c.i * 100, 2)}%).`;
+}
+
+function renderSynth(B, c) {
+  const mv = num($('l-mv').value), q = Math.round(mv / c.val);
+  $('l-big').innerHTML = `${fmt(q, 0)} <span style="font-size:.5em">${c.code} vendidos em taxa</span>`;
+  $('l-say').innerHTML = `${brl(mv, 0)} ÷ ${brl(c.val, 0)} por contrato = ${q}. A LFT segue rendendo CDI, o DAP paga CDI e recebe IPCA + ${fmt(c.i * 100, 2)}%. O caixa passa a render <b>IPCA + ${fmt(c.i * 100, 2)}% até ${monYear(c.mat)}</b>, sem vender nada.`;
+}
+
+function renderImpl(c) {
+  const pre = Number($('i-pre').value) / 100, impl = (1 + pre) / (1 + c.i) - 1;
+  $('i-pre-v').textContent = fmt(pre * 100, 2) + '%';
+  $('i-big').innerHTML = `${fmt(impl * 100, 2)}% <span style="font-size:.5em">de IPCA ao ano até ${monYear(c.mat)}</span>`;
+  const sc = 100 / (pre * 100);
+  $('i-bars').innerHTML = `
+    <div class="brow"><div class="lb">pré (DI1)</div><div class="bar" style="width:100%">${fmt(pre * 100, 2)}%</div></div>
+    <div class="brow"><div class="lb">real × implícita</div><div class="split" style="width:100%">
+      <div class="bar" style="width:${(c.i * 100 * sc).toFixed(1)}%">${fmt(c.i * 100, 2)}%</div>
+      <div class="bar red" style="width:${(Math.max(impl, 0) * 100 * sc).toFixed(1)}%">${fmt(impl * 100, 2)}%</div></div></div>
+    <div class="kv"><div class="k">(1 + pré) = (1 + real) × (1 + implícita)</div><div class="v">${fmt(1 + pre, 4)} = ${fmt(1 + c.i, 4)} × ${fmt(1 + impl, 4)}</div></div>`;
+}
+
+function renderAll() {
+  const B = base(), c = contract($('c-code').value, Number($('c-rate').value), B);
+  renderBase(B); renderPrice(B, c); renderShock(B, c); renderHedge(B); renderSynth(B, c); renderImpl(c);
+}
+
+$('c-code').innerHTML = Object.keys(CURVE).map(k => `<option value="${k}" ${k === 'DAPK35' ? 'selected' : ''}>${k} · ${monYear(codeMat(k))}</option>`).join('');
+$('h-mat').innerHTML = NTNB.map(d => `<option value="${d}" ${d === '2035-05-15' ? 'selected' : ''}>NTN-B ${monYear(d)}</option>`).join('');
+$('c-code').addEventListener('change', () => { $('c-rate').value = CURVE[$('c-code').value]; renderAll(); });
+$('h-mat').addEventListener('change', () => { $('h-y').value = fmt(CURVE[codeOf($('h-mat').value)], 2); renderAll(); });
+document.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === e.target));
+  renderAll();
+}));
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', renderAll));
+renderAll();
+</script>
+</body>
+</html>

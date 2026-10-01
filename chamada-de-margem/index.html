@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chamada de Margem · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent1: #C4192C;
+  --accent2: #8B6914;
+  --accent3: #1A3A6B;
+  --text:    #0D0D0D;
+  --muted:   #888880;
+  --danger:  #C4192C;
+  --success: #1A6B3C;
+  --border:  #D4D0C8;
+  --bg:      #FDFAF5;
+  --w: 900px;
+  --h: 506px;
+}
+
+body {
+  background: #1C1C1C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  padding: 24px;
+  gap: 20px;
+}
+
+#stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  padding: 40px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity .42s ease, transform .42s ease;
+  overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > *    { position: relative; z-index: 1; }
+
+.slide-dark { background: #0F0F0F !important; color: #EDE9E0; }
+
+.deco { position: absolute; border-radius: 50%; z-index: 0; }
+.bar  { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent1); }
+
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  padding: 0 0 3px 0;
+  border: none; border-bottom: 1.5px solid currentColor;
+  background: none;
+  width: fit-content; margin-bottom: 16px;
+}
+.t-navy   { color: var(--accent3); }
+.t-amber  { color: var(--accent2); }
+.t-red    { color: var(--danger); }
+.t-green  { color: var(--success); }
+.t-dark   { color: rgba(237,233,224,.45); border-bottom-color: rgba(237,233,224,.25); }
+
+.display {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 46px; line-height: 1.06;
+  letter-spacing: -.01em; margin-bottom: 14px;
+  font-weight: 700;
+}
+.display em { font-style: italic; color: var(--accent1); }
+
+.h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 30px; line-height: 1.12;
+  letter-spacing: -.01em; margin-bottom: 20px;
+  font-weight: 700;
+}
+.h2 em { font-style: italic; color: var(--accent1); }
+.h2 .n { color: var(--accent3); }
+
+.lead {
+  font-size: 14.5px; line-height: 1.65;
+  color: rgba(13,13,13,.58); max-width: 620px; margin-bottom: 18px;
+}
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; }
+
+.card {
+  background: #fff; border: 1px solid var(--border);
+  border-top: 2px solid var(--text);
+  border-radius: 0; padding: 13px 15px;
+}
+.card .ct { font-size: 9.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.card .cv { font-family: 'Playfair Display', Georgia, serif; font-size: 19px; line-height: 1.2; }
+.card .cs { font-size: 11.5px; color: #5C5A54; margin-top: 4px; line-height: 1.45; }
+
+.box { border-radius: 0; padding: 10px 13px 10px 14px; font-size: 12.5px; line-height: 1.55;
+       border: none; border-left: 3px solid; }
+.box.n  { border-color: var(--accent3); background: rgba(26,58,107,.04); }
+.box.a  { border-color: var(--accent2); background: rgba(139,105,20,.04); }
+.box.v  { border-color: var(--text);    background: rgba(0,0,0,.03); }
+.box.g  { border-color: var(--success); background: rgba(26,107,60,.04); }
+.box.r  { border-color: var(--danger);  background: rgba(196,25,44,.04); }
+
+.dbox { border-radius: 0; padding: 11px 14px; font-size: 12px; line-height: 1.55;
+        border: none; border-left: 2px solid; }
+.dbox.b { border-color: rgba(200,215,240,.35); background: rgba(200,215,240,.05); color: rgba(237,233,224,.78); }
+.dbox.g { border-color: rgba(80,180,130,.35);  background: rgba(80,180,130,.05);  color: rgba(237,233,224,.78); }
+.dbox.a { border-color: rgba(212,170,50,.4);   background: rgba(212,170,50,.06);  color: rgba(237,233,224,.78); }
+.dbox.r { border-color: rgba(196,25,44,.4);    background: rgba(196,25,44,.06);   color: rgba(237,233,224,.78); }
+
+.cr { display:flex; justify-content:space-between; align-items:baseline; padding:7px 0; border-bottom:1px solid #ECEAE3; }
+.cr:last-child { border-bottom:none; }
+.cr .cn { font-size:12.5px; color:rgba(13,13,13,.72); }
+.cr .cv { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent2); font-weight:600; }
+
+.rb { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:0; border:none; border-left:3px solid; }
+.rb .rt { font-size:12px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.rb .rd { font-size:11px; color:#6B6860; line-height:1.4; }
+
+.snum { position:absolute; bottom:18px; right:26px; font-family:'JetBrains Mono',monospace; font-size:10px; color:rgba(13,13,13,.18); letter-spacing:.05em; }
+.snum-d { color:rgba(237,233,224,.2) !important; }
+.sfoot { position:absolute; bottom:15px; left:26px; display:flex; align-items:center; gap:5px; z-index:10; }
+.sfoot span { font-size:9.5px; font-weight:500; letter-spacing:.04em; color:rgba(13,13,13,.28); }
+.sfoot-d span { color:rgba(237,233,224,.25) !important; }
+
+#progress-bar { width: var(--w); height: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--accent1); transition: width .42s ease; }
+
+#controls { display:flex; align-items:center; gap:14px; }
+
+.btn {
+  width: 38px; height: 38px; border-radius: 2px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
+  color: #C8C4BC; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; user-select: none;
+}
+.btn:hover    { background: rgba(255,255,255,.14); }
+.btn:disabled { opacity: .25; cursor: default; }
+
+#counter { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#555550; min-width:48px; text-align:center; }
+
+#btn-print {
+  display:flex; align-items:center; gap:6px;
+  padding:7px 14px; border-radius:2px;
+  background: rgba(196,25,44,.12);
+  border: 1px solid rgba(196,25,44,.28);
+  color: #D4707A;
+  font-family:'Inter',sans-serif;
+  font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; cursor:pointer;
+  transition:background .2s;
+}
+#btn-print:hover { background: rgba(196,25,44,.22); }
+
+@media print {
+  @page { size: 900px 506px; margin: 0; }
+  body { background: #1C1C1C !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position:static !important; width:900px !important; height:506px !important; overflow:visible !important; border-radius:0 !important; box-shadow:none !important; display:block !important; }
+  .slide { position:relative !important; opacity:1 !important; transform:none !important; pointer-events:auto !important; display:flex !important; width:900px !important; height:506px !important; page-break-after:always; break-after:page; overflow:hidden !important; }
+  .slide.exit { display:none !important; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- SLIDE 01: COVER (DARK) -->
+  <div class="slide slide-dark active" id="s1">
+    <div class="bar" style="background:linear-gradient(90deg,var(--accent1),var(--accent3))"></div>
+    <div class="deco" style="width:500px;height:500px;right:-120px;bottom:-180px;border:1px solid rgba(200,215,240,.04)"></div>
+
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-right:48px;">
+        <div class="tag t-dark">Gestao de Risco</div>
+        <div class="display" style="color:#EDE9E0;font-size:42px;line-height:1.06;">
+          Chamada<br>de <em>Margem</em>
+        </div>
+        <p style="font-size:13px;line-height:1.65;color:rgba(237,233,224,.5);max-width:320px;margin:0;">
+          O mecanismo que controla alavancagem e protege o sistema financeiro de falhas em cascata.
+        </p>
+      </div>
+      <div style="width:1px;background:rgba(237,233,224,.08);flex-shrink:0;"></div>
+      <div style="width:260px;flex-shrink:0;padding-left:40px;display:flex;flex-direction:column;justify-content:center;gap:12px;">
+        <div class="dbox r">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(196,25,44,.6);margin-bottom:5px;">O problema</div>
+          Alavancagem expoe o sistema a <strong style="color:#EDE9E0;">perdas que ultrapassam o capital do investidor</strong>
+        </div>
+        <div class="dbox b">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,215,240,.45);margin-bottom:5px;">O mecanismo</div>
+          Colateral obrigatorio que <strong style="color:#EDE9E0;">acompanha a deterioracao</strong> da posicao em tempo real
+        </div>
+        <div class="dbox g">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(80,180,130,.5);margin-bottom:5px;">O efeito</div>
+          Protege o investidor, a corretora <strong style="color:#EDE9E0;">e a cadeia de contrapartes</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="snum snum-d">01 / 07</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 02: O QUE E MARGEM -->
+  <div class="slide" id="s2">
+    <div class="bar" style="background:var(--accent3)"></div>
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+      <div style="flex:1;padding-right:36px;display:flex;flex-direction:column;justify-content:center;">
+        <div class="tag t-navy">O Conceito</div>
+        <div class="h2">Margem e o colateral exigido<br>para manter uma posicao <em>alavancada</em></div>
+        <p class="lead" style="font-size:13px;margin-bottom:14px;">
+          Sempre que voce opera com alavancagem — futuros, opcoes, venda a descoberto, financiamentos — a corretora exige uma garantia. Ela serve como reserva para cobrir perdas potenciais antes que se tornem inadimplencia.
+        </p>
+        <div class="box n" style="font-size:12px;">
+          A margem nao e o custo da operacao. E a prova de que voce tem capital para honrar o prejuizo se o mercado se mover contra voce.
+        </div>
+      </div>
+      <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
+      <div style="width:280px;flex-shrink:0;padding-left:32px;display:flex;flex-direction:column;justify-content:center;gap:11px;">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Onde se aplica</div>
+        <div class="rb" style="border-color:var(--accent3);background:rgba(26,58,107,.04);">
+          <div><div class="rt">Futuros e derivativos</div><div class="rd">Margem inicial + ajuste diario conforme variacao do contrato.</div></div>
+        </div>
+        <div class="rb" style="border-color:var(--accent2);background:rgba(139,105,20,.04);">
+          <div><div class="rt">Venda a descoberto</div><div class="rd">Garantia sobre o valor da posicao vendida em aberto.</div></div>
+        </div>
+        <div class="rb" style="border-color:var(--danger);background:rgba(196,25,44,.04);">
+          <div><div class="rt">Operacoes alavancadas</div><div class="rd">Qualquer exposicao que supere o capital depositado exige colateral.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="snum">02 / 07</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 03: COMO O MECANISMO FUNCIONA -->
+  <div class="slide" id="s3">
+    <div class="bar" style="background:var(--accent2)"></div>
+    <div class="tag t-amber">O Mecanismo</div>
+    <div class="h2">Quando a posicao se deteriora,<br>o colateral e <em>chamado automaticamente</em></div>
+    <div style="display:flex;gap:20px;margin-top:6px;align-items:flex-start;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:0;">
+        <!-- Flow -->
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEAE3;">
+          <div style="width:22px;height:22px;border:1.5px solid var(--accent3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent3);flex-shrink:0;">01</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Margem inicial depositada</div>
+            <div style="font-size:11px;color:rgba(13,13,13,.6);line-height:1.4;">Colateral minimo para abrir a posicao alavancada.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEAE3;">
+          <div style="width:22px;height:22px;border:1.5px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent2);flex-shrink:0;">02</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Mercado se move contra a posicao</div>
+            <div style="font-size:11px;color:rgba(13,13,13,.6);line-height:1.4;">O valor do colateral cai abaixo do nivel de manutencao.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEAE3;">
+          <div style="width:22px;height:22px;border:1.5px solid var(--danger);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--danger);flex-shrink:0;">03</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--danger);margin-bottom:2px;">Chamada de margem disparada</div>
+            <div style="font-size:11px;color:rgba(13,13,13,.6);line-height:1.4;">Corretora exige recomposicao do colateral em prazo definido.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;">
+          <div style="width:22px;height:22px;border:1.5px solid var(--text);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);flex-shrink:0;">04</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Deposita ou fecha</div>
+            <div style="font-size:11px;color:rgba(13,13,13,.6);line-height:1.4;">Sem recomposicao, a posicao e liquidada compulsoriamente.</div>
+          </div>
+        </div>
+      </div>
+      <div style="width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+        <div class="box a" style="font-size:12px;">
+          <strong>Margem inicial</strong> — percentual do valor nocional exigido para abrir a posicao.<br><br>
+          <strong>Margem de manutencao</strong> — nivel minimo para manter a posicao aberta. Abaixo disso, a chamada e acionada.
+        </div>
+      </div>
+    </div>
+    <div class="snum">03 / 07</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 04: POR QUE O RISCO NAO FICA CONTIDO -->
+  <div class="slide" id="s4">
+    <div class="bar" style="background:var(--accent1)"></div>
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+      <div style="flex:1;padding-right:36px;display:flex;flex-direction:column;justify-content:center;">
+        <div class="tag t-red">Por Que Existe</div>
+        <div class="h2">Alavancagem cria perdas que<br><em>ultrapassam o capital investido</em></div>
+        <p class="lead" style="font-size:13px;margin-bottom:14px;">
+          Sem margem, o investidor poderia assumir exposicao ilimitada com capital minimo. Se o mercado se mover contra ele, o prejuizo nao fica contido — ele se propaga para a corretora, e da corretora para o sistema.
+        </p>
+        <div class="box r" style="font-size:12px;">
+          O exemplo mais claro: na venda a descoberto, a acao pode subir indefinidamente. O prejuizo nao tem teto. Sem margem reservada, quem absorve esse buraco e a cadeia de contrapartes.
+        </div>
+      </div>
+      <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
+      <div style="width:280px;flex-shrink:0;padding-left:32px;display:flex;flex-direction:column;justify-content:center;gap:0;">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Quem absorve o prejuizo sem margem</div>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div class="cr"><span class="cn">Investidor</span><span class="cv" style="color:var(--danger);">nao consegue pagar</span></div>
+          <div class="cr"><span class="cn">Corretora</span><span class="cv" style="color:var(--danger);">absorve o deficit</span></div>
+          <div class="cr"><span class="cn">Contrapartes</span><span class="cv" style="color:var(--danger);">nao recebem</span></div>
+          <div class="cr"><span class="cn">Mercado</span><span class="cv" style="color:var(--danger);">risco sistemico</span></div>
+        </div>
+        <div class="box r" style="margin-top:14px;font-size:11.5px;">
+          O risco individual se torna coletivo. E o que a chamada de margem foi desenhada para impedir.
+        </div>
+      </div>
+    </div>
+    <div class="snum">04 / 07</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 05: O EFEITO SEM MARGEM -->
+  <div class="slide" id="s5">
+    <div class="bar" style="background:var(--danger)"></div>
+    <div class="tag t-red">Risco Sistemico</div>
+    <div class="h2">Sem o mecanismo, um calote<br><em>contamina a cadeia toda</em></div>
+    <div style="display:flex;gap:20px;margin-top:8px;align-items:flex-start;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+        <div style="padding:9px 14px;background:rgba(196,25,44,.04);border:1px solid rgba(196,25,44,.10);font-size:12px;color:rgba(13,13,13,.75);line-height:1.45;">
+          Investidor assume posicao alavancada com colateral insuficiente
+        </div>
+        <div style="padding:9px 14px;background:rgba(196,25,44,.07);border:1px solid rgba(196,25,44,.16);font-size:12px;color:rgba(13,13,13,.75);line-height:1.45;">
+          Mercado se move contra — prejuizo supera o capital disponivel
+        </div>
+        <div style="padding:9px 14px;background:rgba(196,25,44,.11);border:1px solid rgba(196,25,44,.22);font-size:12px;color:rgba(13,13,13,.78);line-height:1.45;">
+          Investidor nao consegue honrar o ajuste — inadimplencia
+        </div>
+        <div style="padding:9px 14px;background:rgba(196,25,44,.16);border:1px solid rgba(196,25,44,.30);font-size:12px;font-weight:600;color:var(--danger);line-height:1.45;">
+          Corretora e contrapartes absorvem o buraco — risco em cascata
+        </div>
+      </div>
+      <div style="width:248px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+        <div class="box r" style="font-size:12px;">
+          Isso nao e hipotetico. Em crises de liquidez, a liquidacao forcada de posicoes alavancadas amplifica a volatilidade e acelera a queda do mercado.
+        </div>
+        <div class="box a" style="font-size:12px;">
+          A chamada de margem interrompe esse ciclo antes que o prejuizo individual se torne um problema coletivo.
+        </div>
+      </div>
+    </div>
+    <div class="snum">05 / 07</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 06: MARGEM COMO PROTECAO SISTEMICA -->
+  <div class="slide" id="s6">
+    <div class="bar" style="background:var(--accent3)"></div>
+    <div style="display:flex;gap:0;align-items:stretch;width:100%;">
+      <div style="flex:1;padding-right:36px;display:flex;flex-direction:column;justify-content:center;">
+        <div class="tag t-navy">Protecao Sistemica</div>
+        <div class="h2">A margem nao protege so<br>a corretora. Protege <em>o mercado inteiro.</em></div>
+        <p class="lead" style="font-size:13px;margin-bottom:0;">
+          O mecanismo de margem e uma das poucas ferramentas que operam em tempo real para controlar alavancagem agregada no sistema. Quanto maior a volatilidade, mais severa a exigencia — e e exatamente quando mais importa.
+        </p>
+      </div>
+      <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
+      <div style="width:300px;flex-shrink:0;padding-left:32px;display:flex;flex-direction:column;justify-content:center;gap:12px;">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">O que o mecanismo garante</div>
+        <div class="card">
+          <div class="ct">Disciplina de tamanho</div>
+          <div class="cs">Quem nao tem capital para a margem nao pode abrir a posicao. Exposicao irresponsavel e bloqueada antes de existir.</div>
+        </div>
+        <div class="card">
+          <div class="ct">Ajuste continuo</div>
+          <div class="cs">A exigencia de colateral acompanha a variacao do mercado — nao e uma checagem pontual, e um controle dinamico.</div>
+        </div>
+        <div class="card">
+          <div class="ct">Liquidacao ordenada</div>
+          <div class="cs">Quando o colateral se esgota, a posicao e encerrada antes que o prejuizo se propague para o sistema.</div>
+        </div>
+      </div>
+    </div>
+    <div class="snum">06 / 07</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- SLIDE 07: CLOSING (DARK) -->
+  <div class="slide slide-dark" id="s7">
+    <div class="bar" style="background:linear-gradient(90deg,var(--accent1),var(--accent3))"></div>
+    <div class="deco" style="width:400px;height:400px;right:-80px;bottom:-120px;border:1px solid rgba(200,215,240,.05)"></div>
+
+    <div class="tag t-dark">Alavancagem e Risco</div>
+    <div class="display" style="color:#EDE9E0;font-size:36px;line-height:1.1;margin-bottom:12px;">
+      Margem nao e restricao.<br>E o <em style="color:#D4A843;">preco de acesso</em><br>ao mercado alavancado.
+    </div>
+    <p class="lead" style="color:rgba(237,233,224,.6);max-width:640px;font-size:13.5px;margin-bottom:16px;">
+      Entender o mecanismo de chamada de margem e entender como o sistema se protege de si mesmo. Alavancagem sem colateral e risco que o mercado inteiro carrega — nao so voce.
+    </p>
+    <div style="display:flex;gap:10px;">
+      <div class="dbox b" style="flex:1;font-size:11.5px;"><strong>Colateral dinamico</strong><br>A exigencia acompanha o mercado em tempo real.</div>
+      <div class="dbox r" style="flex:1;font-size:11.5px;"><strong>Risco nao contido</strong><br>Sem margem, o prejuizo individual vira problema coletivo.</div>
+      <div class="dbox g" style="flex:1;font-size:11.5px;"><strong>Controle sistemico</strong><br>O mecanismo limita alavancagem agregada no sistema.</div>
+    </div>
+
+    <div class="snum snum-d">07 / 07</div>
+    <div class="sfoot sfoot-d"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:14.29%"></div></div>
+
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 7</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+  const slides  = document.querySelectorAll('.slide');
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+    counter.textContent = (cur + 1) + ' / ' + N;
+    fill.style.width    = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled    = cur === 0;
+    btnNext.disabled    = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

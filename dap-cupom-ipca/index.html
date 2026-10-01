@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAP · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F7F5;
+  --ink: #1F1F1F;
+  --mute: #6B6B69;
+  --line: #DEDEDA;
+  --accent: #BE2B2B;
+  --hl-ink: #F9F9F7;
+  --t1: rgba(31,31,31,.86);
+  --t2: rgba(31,31,31,.62);
+  --hand: 'Permanent Marker', cursive;
+  --mono: 'Space Mono', monospace;
+  --w: 900px;
+  --h: 1125px;
+}
+
+body {
+  background: #141414;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px; gap: 20px;
+  font-family: var(--mono); color: var(--ink);
+}
+
+#stage {
+  position: relative; width: var(--w); height: var(--h); overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05);
+}
+
+.slide {
+  position: absolute; inset: 0; background: var(--bg);
+  padding: 72px 64px 90px;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  opacity: 0; pointer-events: none; transform: translateX(40px);
+  transition: opacity .42s ease, transform .42s ease; overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > *    { position: relative; z-index: 2; }
+
+/* papel: vinheta leve + retícula offset e grão por cima da tinta */
+.slide::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 120px rgba(80,80,80,.10); }
+.slide::after {
+  content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; mix-blend-mode: multiply; opacity: .34;
+  background-image:
+    radial-gradient(rgba(0,0,0,.09) .9px, transparent 1.25px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 5px 5px, 260px 260px;
+}
+
+.title {
+  font-family: var(--hand); font-weight: 400; line-height: 1.02; text-shadow: 0 0 .6px currentColor;
+  font-size: 92px; transform: rotate(-3deg); transform-origin: left; margin-bottom: 36px;
+}
+.title.md { font-size: 64px; }
+.title.sm { font-size: 52px; }
+.hl { display: inline-block; background: var(--accent); color: var(--hl-ink); padding: 0 .14em; }
+.lead { font-size: 23px; line-height: 1.55; color: var(--t1); max-width: 760px; }
+.lead b { color: var(--ink); font-weight: 700; }
+.lead code { font-family: var(--mono); font-size: 20px; color: var(--ink); background: #EAEAE6; padding: 2px 8px; }
+.src { font-size: 14px; line-height: 1.5; color: var(--t2); margin-top: auto; max-width: 720px; }
+
+.duo { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 0 18px; }
+.duo > div { padding: 22px 0 22px; }
+.duo > div + div { border-left: 1px solid var(--line); padding-left: 36px; }
+.duo .lbl { font-size: 16px; letter-spacing: .18em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+.duo .n { font-family: var(--hand); font-size: 96px; line-height: 1; font-variant-numeric: tabular-nums; }
+.duo .n.red { color: var(--accent); }
+.duo .cap { font-size: 18px; color: var(--t1); margin-top: 10px; line-height: 1.5; }
+
+.stat .n { font-family: var(--hand); font-size: 130px; line-height: 1; color: var(--accent); }
+.stat .t { font-size: 22px; line-height: 1.55; color: var(--t1); max-width: 680px; margin-top: 10px; }
+
+.ans { border-top: 1px solid var(--line); }
+.ans .r { display: grid; grid-template-columns: 250px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.ans .a { font-family: var(--hand); font-size: 30px; line-height: 1.15; }
+.ans .a.red { color: var(--accent); }
+.ans .d { font-size: 19px; line-height: 1.55; color: var(--t1); }
+.ans .d b { color: var(--ink); }
+
+svg.draw { display: block; overflow: visible; }
+
+.snum { position: absolute; bottom: 30px; right: 40px; font-size: 15px; color: var(--t2); letter-spacing: .08em; z-index: 3; }
+.sfoot { position: absolute; bottom: 28px; left: 40px; z-index: 3; }
+.sfoot span { font-size: 15px; letter-spacing: .04em; color: var(--t2); }
+
+#progress-bar { width: var(--w); height: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--accent); transition: width .42s ease; }
+#controls { display: flex; align-items: center; gap: 14px; }
+.btn { width: 38px; height: 38px; border-radius: 0; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); color: #ccc; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.btn:hover { background: rgba(255,255,255,.14); }
+.btn:disabled { opacity: .25; cursor: default; }
+#counter { font-size: 11.5px; color: #666; min-width: 48px; text-align: center; }
+#btn-print { padding: 8px 14px; border-radius: 0; background: rgba(255,59,47,.12); border: 1px solid rgba(255,59,47,.35); color: #ff8a82; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+
+@media print {
+  @page { size: 900px 1125px; margin: 0; }
+  body { background: var(--bg) !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position: static !important; width: 900px !important; height: auto !important; overflow: visible !important; box-shadow: none !important; }
+  .slide { position: relative !important; opacity: 1 !important; transform: none !important; display: flex !important; width: 900px !important; height: 1125px !important; page-break-after: always; break-after: page; overflow: hidden !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- 01 COVER -->
+  <div class="slide active" id="s1">
+    <div class="title">O juro real<br>do Brasil tem<br><span class="hl">um ticker.</span></div>
+    <svg class="draw" id="d1" width="772" height="340"></svg>
+    <p class="lead" style="margin-top:26px;">DAP: o que é, como calcular o preço e como ele conversa com NTN-B, LFT, CDI e IPCA.</p>
+    <div class="src">Curva DAP, últimos negócios em 10/08/2026. Fonte: B3.</div>
+    <div class="snum">01 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 02 O QUE E -->
+  <div class="slide" id="s2">
+    <div class="title md">Um swap de CDI<br>contra IPCA + taxa.</div>
+    <svg class="draw" id="d2" width="772" height="430"></svg>
+    <p class="lead" style="margin-top:18px;">O nome oficial é Futuro de Cupom de IPCA. Ninguém troca fluxo de verdade: a B3 liquida a diferença todo dia, e o notional é corrigido pelo IPCA para continuar em termos reais.</p>
+    <div class="src">B3, Guia do Contrato Futuro de Cupom de IPCA (DAP). Vencimento todo dia 15, código DAP + mês + ano (DAPK35 = maio de 2035).</div>
+    <div class="snum">02 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 03 TAXA X PU -->
+  <div class="slide" id="s3">
+    <div class="title md">Negocia em taxa.<br>Ajusta em PU.</div>
+    <svg class="draw" id="d3" width="772" height="500"></svg>
+    <p class="lead" style="margin-top:22px;">Comprado em taxa é vendido em PU. Em 100 contratos de DAPK35 vendidos em taxa, 50 bps de queda rendem R$ 404 mil e 50 bps de alta custam R$ 387 mil. A curva é convexa.</p>
+    <div class="src">PU = 100.000 / (1 + i)^(du/252). DAPK35, du = 2.193, VNA 7.655,36. Cálculo próprio.</div>
+    <div class="snum">03 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 04 PRECO -->
+  <div class="slide" id="s4">
+    <div class="title md">Da taxa ao real<br>em três contas.</div>
+    <svg class="draw" id="d4" width="772" height="556"></svg>
+    <p class="lead" style="margin-top:20px;">Repita a conta com a taxa 1 bp acima e a diferença é o DV01: <b>R$ 79,04 por contrato</b>. É esse número que dimensiona hedge e limite de risco.</p>
+    <div class="src">DAPK35 a 7,98% em 10/08/2026. NI IPCA jun/26 7.652,37 (IBGE), projeção ANBIMA 0,05%. Confere com o PU de 51.266,50 da B3.</div>
+    <div class="snum">04 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 05 NTN-B LFT -->
+  <div class="slide" id="s5">
+    <div class="title md">Some um DAP e<br>a NTN-B vira LFT.</div>
+    <svg class="draw" id="d5" width="772" height="560"></svg>
+    <p class="lead" style="margin-top:18px;">O DAP é a ponte entre o mundo pós e o mundo IPCA+. Quem tem caixa em LFT compra exposição a juro real sem vender nada. Quem tem NTN-B tira o juro real e fica com o spread.</p>
+    <div class="snum">05 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 06 IMPLICITA -->
+  <div class="slide" id="s6">
+    <div class="title md">DI contra DAP<br>é a inflação implícita.</div>
+    <div class="stat">
+      <div class="n">6,05%</div>
+      <div class="t">ao ano até maio de 2035. É o IPCA médio que o mercado cobra para trocar pré por IPCA+.</div>
+    </div>
+    <svg class="draw" id="d6" width="772" height="290" style="margin-top:30px;"></svg>
+    <p class="lead" style="margin-top:14px;"><code>(1 + 14,52%) = (1 + 7,98%) × (1 + 6,05%)</code></p>
+    <div class="src">B3, 10/08/2026. DI interpolado (flat forward) até o vencimento do DAP: DI1 vence no dia 1, DAP no dia 15.</div>
+    <div class="snum">06 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 07 HEDGE -->
+  <div class="slide" id="s7">
+    <div class="title md">R$ 10 mi em NTN-B 35:<br>o hedge é 78, não 102.</div>
+    <div class="duo">
+      <div><div class="lbl">pelo notional</div><div class="n">102</div><div class="cap">R$ 10 mi ÷ R$ 98.116</div></div>
+      <div><div class="lbl">pelo DV01</div><div class="n red">78</div><div class="cap">R$ 6.181 ÷ R$ 79,04</div></div>
+    </div>
+    <svg class="draw" id="d7" width="772" height="250"></svg>
+    <p class="lead" style="margin-top:14px;">O cupom de 6% ao ano encurta a duration da NTN-B para 6,2. O DAP não paga cupom e tem 8,1. Depois do hedge, sobra CDI mais o casado.</p>
+    <div class="src">NTN-B mai/35 a 7,98% (casado zero por simplificação), data-base 10/08/2026. DV01 por 1 bp de taxa. Cálculo próprio.</div>
+    <div class="snum">07 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 08 DIRECIONAL -->
+  <div class="slide" id="s8">
+    <div class="title md">Três visões,<br>três montagens.</div>
+    <div class="ans">
+      <div class="r"><div class="a">Juro real vai cair</div><div class="d"><b>Vende taxa de DAP.</b> Ganha como uma NTN-B, sem comprar o título. Somado a LFT, vira IPCA+ sintético com o caixa intacto.</div></div>
+      <div class="r"><div class="a">CDI vai render mais que IPCA + 7,98%</div><div class="d"><b>Compra taxa e carrega.</b> O ajuste diário corrige o PU por CDI e IPCA. Com taxa parada, você recebe o juro real realizado menos o cupom travado.</div></div>
+      <div class="r"><div class="a red">IPCA vai vir acima de 6,05%</div><div class="d"><b>Vende taxa de DAP e compra taxa de DI1</b>, com DV01 casado. O juro real sai da conta e sobra só a aposta na inflação implícita.</div></div>
+    </div>
+    <p class="lead" style="margin-top:34px;">Cada montagem isola um risco. Misturar sem perceber é o erro mais comum.</p>
+    <div class="snum">08 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 09 ARMADILHAS -->
+  <div class="slide" id="s9">
+    <div class="title md">Quatro detalhes que<br>derrubam o cálculo.</div>
+    <div class="ans">
+      <div class="r"><div class="a red">Sinal</div><div class="d">Comprado em taxa é vendido em PU. Boleta, risco e custodiante precisam falar a mesma língua.</div></div>
+      <div class="r"><div class="a">Dia 15</div><div class="d">DAP vence dia 15, DI1 no dia 1. Implícita sem interpolar a curva pré carrega dez dias úteis de erro.</div></div>
+      <div class="r"><div class="a">Vértice curto</div><div class="d">DV01 perto de zero e taxa dominada pelo IPCA do mês. Não serve para hedge nem para ler juro real.</div></div>
+      <div class="r"><div class="a">Bloomberg</div><div class="d">O PX_SETTLE do DAP vem em taxa, não em preço. Converta para PU antes de marcar a mercado.</div></div>
+    </div>
+    <p class="lead" style="margin-top:30px;">A liquidez se concentra em maio e agosto, os vencimentos casados com NTN-B.</p>
+    <div class="snum">09 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+  <!-- 10 CLOSE -->
+  <div class="slide" id="s10" style="justify-content:flex-end;">
+    <svg class="draw" id="d10" width="772" height="360" style="margin-bottom:40px;"></svg>
+    <div class="title" style="font-size:84px;">Escolha o risco:<br>real, implícita<br><span class="hl">ou os dois.</span></div>
+    <p class="lead" style="margin-bottom:22px;">O DAP separa duas apostas que a NTN-B entrega juntas. A calculadora no primeiro comentário faz preço, DV01, hedge e implícita para qualquer vencimento.</p>
+    <p class="lead"><b>Hoje, qual desses riscos está na sua carteira sem você ter escolhido?</b></p>
+    <div class="snum">10 / 10</div>
+    <div class="sfoot"><span>linkedin.com/in/guilmoreira</span></div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:10%"></div></div>
+
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 10</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">Exportar PDF</button>
+</div>
+
+<script>
+  const slides  = document.querySelectorAll('.slide');
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+    counter.textContent = (cur + 1) + ' / ' + N;
+    fill.style.width    = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled    = cur === 0;
+    btnNext.disabled    = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+  /* ---------- Hand-drawn diagrams ---------- */
+  const NS = 'http://www.w3.org/2000/svg';
+  const INK = '#1F1F1F', RED = '#BE2B2B', MUTE = '#6B6B69';
+  const HAND = "'Permanent Marker', cursive", MONO = "'Space Mono', monospace";
+
+  function txt(svg, x, y, s, { size = 22, fill = INK, anchor = 'start', font = HAND, rot = 0 } = {}) {
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y);
+    t.setAttribute('fill', fill); t.setAttribute('font-size', size);
+    t.setAttribute('font-family', font); t.setAttribute('text-anchor', anchor);
+    if (rot) t.setAttribute('transform', `rotate(${rot} ${x} ${y})`);
+    t.textContent = s; svg.appendChild(t); return t;
+  }
+
+  function arrow(rc, svg, x1, y1, cx, cy, x2, y2, color) {
+    const o = { stroke: color, strokeWidth: 2, roughness: 1.2 };
+    svg.appendChild(rc.path(`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`, o));
+    const a = Math.atan2(y2 - cy, x2 - cx), L = 14;
+    svg.appendChild(rc.line(x2, y2, x2 - L * Math.cos(a - .45), y2 - L * Math.sin(a - .45), o));
+    svg.appendChild(rc.line(x2, y2, x2 - L * Math.cos(a + .45), y2 - L * Math.sin(a + .45), o));
+  }
+
+  const rect = (rc, svg, x, y, w, h, c, extra = {}) =>
+    svg.appendChild(rc.rectangle(x, y, w, h, { stroke: c, strokeWidth: 2, roughness: 1.3, ...extra }));
+
+  const pu = (i, du) => 1e5 / Math.pow(1 + i, du / 252);
+  const fmt = (v, d = 2) => v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  function drawAll() {
+    if (typeof rough === 'undefined') return;
+
+    /* 01: DAP curve */
+    const s1 = document.getElementById('d1'), r1 = rough.svg(s1);
+    const curve = [['Q28',505,8.33],['K29',689,8.16],['K31',1189,8.175],['Q32',1507,8.145],['K33',1694,8.11],
+                   ['K35',2193,7.98],['K37',2694,7.79],['Q40',3512,7.71],['K45',4699,7.56],['Q50',6014,7.52],
+                   ['K55',7203,7.42],['Q60',8520,7.42]];
+    const X1 = d => 20 + d / 8520 * 730, Y1 = r => 290 - (r - 7.2) / 1.3 * 250;
+    s1.appendChild(r1.line(10, 300, 762, 300, { stroke: MUTE, strokeWidth: 1.5, roughness: 1 }));
+    [7.5, 8.0].forEach(r => {
+      s1.appendChild(r1.line(14, Y1(r), 762, Y1(r), { stroke: MUTE, strokeWidth: 1, roughness: .6, strokeLineDash: [4, 8] }));
+      txt(s1, 6, Y1(r) + 5, fmt(r, 1) + '%', { size: 14, fill: MUTE, anchor: 'end', font: MONO });
+    });
+    s1.appendChild(r1.curve(curve.map(p => [X1(p[1]), Y1(p[2])]), { stroke: RED, strokeWidth: 3.5, roughness: 1 }));
+    curve.forEach(p => s1.appendChild(r1.circle(X1(p[1]), Y1(p[2]), 9, { stroke: INK, strokeWidth: 1.5, fill: INK, fillStyle: 'solid', roughness: .6 })));
+    [['2028', 505], ['2035', 2193], ['2045', 4699], ['2060', 8520]].forEach(([l, d]) =>
+      txt(s1, X1(d), 326, l, { size: 15, fill: MUTE, anchor: 'middle', font: MONO }));
+    txt(s1, X1(2193) - 4, Y1(7.98) - 24, 'K35: 7,98%', { size: 24 });
+    txt(s1, X1(8520), Y1(7.42) - 22, '7,42%', { size: 24, anchor: 'end' });
+    txt(s1, 200, 30, '8,33%: o curto paga mais,', { size: 22 });
+    txt(s1, 200, 58, 'é o aperto de hoje', { size: 22, fill: MUTE });
+    arrow(r1, s1, 192, 30, 110, 18, X1(505) + 6, Y1(8.33) - 10, INK);
+    txt(s1, 470, 92, 'o longo estabiliza', { size: 22 });
+    txt(s1, 470, 120, 'perto de 7,5%', { size: 22, fill: MUTE });
+    arrow(r1, s1, 600, 150, 630, 190, X1(6014) + 6, Y1(7.52) - 14, INK);
+
+    /* 02: the two legs */
+    const s2 = document.getElementById('d2'), r2 = rough.svg(s2);
+    rect(r2, s2, 4, 160, 236, 110, INK);
+    rect(r2, s2, 532, 160, 236, 110, INK);
+    txt(s2, 122, 208, 'comprado', { size: 30, anchor: 'middle' });
+    txt(s2, 122, 244, 'em taxa', { size: 30, anchor: 'middle' });
+    txt(s2, 650, 208, 'vendido', { size: 30, anchor: 'middle' });
+    txt(s2, 650, 244, 'em taxa', { size: 30, anchor: 'middle' });
+    s2.appendChild(r2.ellipse(386, 215, 150, 84, { stroke: MUTE, strokeWidth: 1.5, roughness: 1.2 }));
+    txt(s2, 386, 216, 'B3', { size: 30, anchor: 'middle', fill: MUTE });
+    txt(s2, 386, 240, 'contraparte', { size: 13, anchor: 'middle', fill: MUTE, font: MONO });
+    arrow(r2, s2, 560, 156, 386, 28, 214, 156, INK);
+    txt(s2, 386, 70, 'CDI acumulado', { size: 28, anchor: 'middle' });
+    arrow(r2, s2, 214, 274, 386, 404, 560, 274, RED);
+    txt(s2, 386, 380, 'IPCA + cupom', { size: 28, anchor: 'middle', fill: RED });
+    txt(s2, 4, 316, 'ganha se o', { size: 16, fill: MUTE, font: MONO });
+    txt(s2, 4, 338, 'juro real sobe', { size: 16, fill: MUTE, font: MONO });
+    txt(s2, 768, 316, 'ganha se o', { size: 16, fill: MUTE, font: MONO, anchor: 'end' });
+    txt(s2, 768, 338, 'juro real cai', { size: 16, fill: MUTE, font: MONO, anchor: 'end' });
+    txt(s2, 4, 120, 'recebe CDI,', { size: 20, rot: -4 });
+    txt(s2, 4, 146, 'paga IPCA + cupom', { size: 20, rot: -4 });
+
+    /* 03: PU x taxa */
+    const s3 = document.getElementById('d3'), r3 = rough.svg(s3);
+    const DU = 2193, VNA = 7655.364243;
+    const X3 = i => 70 + (i - .04) / .08 * 680, Y3 = p => 450 - (p - 35000) / 40000 * 430;
+    const ax = { stroke: MUTE, strokeWidth: 1.5, roughness: 1 };
+    s3.appendChild(r3.line(70, 10, 70, 452, ax));
+    s3.appendChild(r3.line(68, 450, 762, 450, ax));
+    [.04, .06, .08, .10, .12].forEach(i => txt(s3, X3(i), 478, fmt(i * 100, 0) + '%', { size: 15, fill: MUTE, anchor: 'middle', font: MONO }));
+    [40000, 50000, 60000, 70000].forEach(p => txt(s3, 60, Y3(p) + 5, (p / 1000) + 'k', { size: 15, fill: MUTE, anchor: 'end', font: MONO }));
+    txt(s3, 762, 500, 'taxa (% a.a.)', { size: 15, fill: MUTE, anchor: 'end', font: MONO });
+    txt(s3, 80, 18, 'PU (pontos)', { size: 15, fill: MUTE, font: MONO });
+    const pts = []; for (let i = .04; i <= .1201; i += .004) pts.push([X3(i), Y3(pu(i, DU))]);
+    s3.appendChild(r3.curve(pts, { stroke: INK, strokeWidth: 3, roughness: 1 }));
+    const i0 = .0798, p0 = pu(i0, DU);
+    const dash = { stroke: MUTE, strokeWidth: 1.2, roughness: 1, strokeLineDash: [6, 6] };
+    s3.appendChild(r3.line(X3(i0), Y3(p0), X3(i0), 450, dash));
+    s3.appendChild(r3.line(70, Y3(p0), X3(i0), Y3(p0), dash));
+    s3.appendChild(r3.circle(X3(i0), Y3(p0), 12, { stroke: INK, fill: INK, fillStyle: 'solid', roughness: .6 }));
+    txt(s3, 290, 56, 'DAPK35 hoje', { size: 16, fill: MUTE, font: MONO });
+    txt(s3, 290, 88, '7,98% = 51.266 pts', { size: 24 });
+    arrow(r3, s3, 400, 100, 440, 180, X3(i0) + 4, Y3(p0) - 14, INK);
+    [[-.005, '+R$ 404 mil', 'taxa -50 bps'], [.005, '-R$ 387 mil', 'taxa +50 bps']].forEach(([d, l, k], j) => {
+      const xi = X3(i0 + d), yi = Y3(pu(i0 + d, DU));
+      s3.appendChild(r3.circle(xi, yi, 10, { stroke: RED, strokeWidth: 2, roughness: .8 }));
+      if (j === 0) {
+        txt(s3, 100, 330, k, { size: 16, fill: MUTE, font: MONO });
+        txt(s3, 100, 362, l, { size: 26, fill: RED });
+        arrow(r3, s3, 230, 312, 300, 300, xi - 6, yi + 10, RED);
+      } else {
+        txt(s3, 600, 110, k, { size: 16, fill: MUTE, font: MONO });
+        txt(s3, 600, 142, l, { size: 26, fill: RED });
+        arrow(r3, s3, 690, 156, 640, 280, xi + 10, yi - 2, RED);
+      }
+    });
+    txt(s3, 100, 400, '100 contratos vendidos em taxa', { size: 15, fill: MUTE, font: MONO });
+
+    /* 04: price chain */
+    const s4 = document.getElementById('d4'), r4 = rough.svg(s4);
+    const steps = [
+      { x: 0,   y: 0,   l: '1. taxa negociada, DAPK35', v: '7,98% a.a.', s: '' },
+      { x: 342, y: 140, l: '2. PU = 100.000 / (1+i)^(du/252)', v: '51.266,50 pts', s: 'du = 2.193 dias úteis' },
+      { x: 0,   y: 290, l: '3. VNA = NI x (1+proj)^(dup/dut)', v: '7.655,36', s: '7.652,37 x 1,0005^(18/23)' },
+      { x: 342, y: 440, l: '4. R$ = PU x 0,00025 x VNA', v: 'R$ 98.115,94', s: '' }
+    ];
+    steps.forEach((b, k) => {
+      const last = k === 3, c = last ? RED : INK;
+      rect(r4, s4, b.x, b.y, 430, 112, c);
+      txt(s4, b.x + 18, b.y + 30, b.l, { size: 14.5, fill: MUTE, font: MONO });
+      txt(s4, b.x + 18, b.y + 76, b.v, { size: 36, fill: c });
+      if (b.s) txt(s4, b.x + 18, b.y + 102, b.s, { size: 13.5, fill: MUTE, font: MONO });
+    });
+    arrow(r4, s4, 434, 56, 540, 54, 556, 134, INK);
+    arrow(r4, s4, 338, 198, 220, 204, 206, 284, INK);
+    arrow(r4, s4, 434, 346, 540, 344, 556, 434, INK);
+    txt(s4, 470, 32, '% a.a., base 252', { size: 19, fill: MUTE });
+    txt(s4, 4, 168, 'pregão (inclusive)', { size: 19, fill: MUTE });
+    txt(s4, 4, 194, 'até dia 15 (exclusive)', { size: 19, fill: MUTE });
+    txt(s4, 470, 314, 'IPCA do mês anterior', { size: 19, fill: MUTE });
+    txt(s4, 470, 340, '+ projeção ANBIMA', { size: 19, fill: MUTE });
+    txt(s4, 4, 490, 'valor de 1 contrato', { size: 22, fill: RED });
+    arrow(r4, s4, 230, 500, 290, 530, 336, 508, RED);
+
+    /* 05: synthetic equations */
+    const s5 = document.getElementById('d5'), r5 = rough.svg(s5);
+    const rows = [
+      [['LFT', 'rende CDI'], '+', ['DAP vendido', 'recebe IPCA+cupom, paga CDI'], ['NTN-B sintética', 'IPCA + 7,98%']],
+      [['NTN-B', 'rende IPCA + taxa'], '+', ['DAP comprado', 'recebe CDI, paga IPCA+cupom'], ['CDI + casado', 'LFT sintética']],
+      [['DI1', 'taxa pré'], '÷', ['DAP', 'taxa real'], ['implícita', 'inflação no preço']]
+    ];
+    rows.forEach((row, k) => {
+      const y = k * 196;
+      const [A, op, B, C] = row;
+      const boxes = [[0, 186, A, INK], [238, 254, B, INK], [540, 232, C, RED]];
+      boxes.forEach(([x, w, t, c]) => {
+        rect(r5, s5, x, y, w, 96, c);
+        txt(s5, x + w / 2, y + 46, t[0], { size: t[0].length > 11 ? 22 : 28, anchor: 'middle', fill: c });
+        txt(s5, x + w / 2, y + 76, t[1], { size: 12.5, anchor: 'middle', fill: MUTE, font: MONO });
+      });
+      txt(s5, 212, y + 60, op, { size: 38, anchor: 'middle' });
+      txt(s5, 513, y + 60, '=', { size: 38, anchor: 'middle' });
+    });
+    txt(s5, 238, 340, 'casado = NTN-B menos DAP.', { size: 21, fill: RED });
+    txt(s5, 238, 366, 'a B3 usa no ajuste', { size: 17, fill: MUTE, font: MONO });
+    arrow(r5, s5, 598, 334, 680, 340, 696, 302, RED);
+
+    /* 06: pre = real x implicit */
+    const s6 = document.getElementById('d6'), r6 = rough.svg(s6);
+    const SC = 47;
+    [['mai/35', 14.52, 7.98, 6.05, 0], ['mai/29', 14.18, 8.16, 5.57, 150]].forEach(([lb, pre, re, im, y]) => {
+      txt(s6, 0, y + 18, lb, { size: 15, fill: MUTE, font: MONO });
+      rect(r6, s6, 90, y, pre * SC, 40, MUTE);
+      txt(s6, 104, y + 28, 'pré ' + fmt(pre), { size: 20, fill: MUTE });
+      rect(r6, s6, 90, y + 52, re * SC, 40, INK);
+      txt(s6, 104, y + 80, 'real ' + fmt(re), { size: 20 });
+      rect(r6, s6, 90 + re * SC + 6, y + 52, im * SC, 40, RED, { fill: RED, fillStyle: 'hachure', hachureGap: 7, fillWeight: 1 });
+      txt(s6, 90 + re * SC + 18, y + 80, 'implícita ' + fmt(im), { size: 20, fill: INK });
+    });
+
+    /* 07: DV01 balance */
+    const s7 = document.getElementById('d7'), r7 = rough.svg(s7);
+    s7.appendChild(r7.line(60, 130, 712, 126, { stroke: INK, strokeWidth: 3, roughness: 1.2 }));
+    s7.appendChild(r7.polygon([[386, 128], [340, 210], [432, 210]], { stroke: INK, strokeWidth: 2, roughness: 1.3 }));
+    rect(r7, s7, 60, 40, 280, 82, INK);
+    txt(s7, 200, 76, 'NTN-B 2035', { size: 24, anchor: 'middle' });
+    txt(s7, 200, 104, 'R$ 6.181 por bp', { size: 15, anchor: 'middle', fill: MUTE, font: MONO });
+    rect(r7, s7, 432, 36, 280, 82, RED);
+    txt(s7, 572, 72, '78 DAPK35', { size: 24, anchor: 'middle', fill: RED });
+    txt(s7, 572, 100, 'R$ 6.165 por bp', { size: 15, anchor: 'middle', fill: MUTE, font: MONO });
+    txt(s7, 440, 182, 'comprado em taxa:', { size: 19, fill: MUTE });
+    txt(s7, 440, 208, 'ganha quando a NTN-B perde', { size: 19, fill: MUTE });
+    txt(s7, 60, 182, 'juro real sobe 1 bp,', { size: 19, fill: MUTE });
+    txt(s7, 60, 208, 'os dois lados se anulam', { size: 19, fill: MUTE });
+
+    /* 10: three risks */
+    const s10 = document.getElementById('d10'), r10 = rough.svg(s10);
+    rect(r10, s10, 0, 60, 230, 100, INK);
+    txt(s10, 115, 106, 'NTN-B', { size: 34, anchor: 'middle' });
+    txt(s10, 115, 138, 'real + implícita', { size: 14, anchor: 'middle', fill: MUTE, font: MONO });
+    rect(r10, s10, 470, 0, 300, 100, INK);
+    txt(s10, 620, 46, 'juro real', { size: 32, anchor: 'middle' });
+    txt(s10, 620, 78, 'DAP sozinho', { size: 14, anchor: 'middle', fill: MUTE, font: MONO });
+    rect(r10, s10, 470, 180, 300, 100, RED);
+    txt(s10, 620, 226, 'implícita', { size: 32, anchor: 'middle', fill: RED });
+    txt(s10, 620, 258, 'DI1 contra DAP', { size: 14, anchor: 'middle', fill: MUTE, font: MONO });
+    arrow(r10, s10, 234, 92, 340, 30, 462, 50, INK);
+    arrow(r10, s10, 234, 130, 340, 230, 462, 226, RED);
+    txt(s10, 260, 330, 'o DAP é a tesoura', { size: 26, fill: MUTE, rot: -3 });
+  }
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll); else window.addEventListener('load', drawAll);
+</script>
+</body>
+</html>

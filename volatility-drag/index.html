@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volatility Drag · LinkedIn Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:   #F5A623;
+  --coral:  #E8132A;
+  --lime:   #F5A623;
+  --orange: #FF6B35;
+  --navy:   #080D08;
+  --text:   #FFFFFF;
+  --muted:  rgba(255,240,210,.42);
+  --line:   rgba(245,166,35,.15);
+  --w: 900px;
+  --h: 1125px;
+}
+
+body {
+  background: #050805;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  padding: 24px;
+  gap: 20px;
+}
+
+#stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 28px 90px rgba(0,0,0,.85), 0 0 0 1px rgba(245,166,35,.07);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background: var(--navy);
+  padding: 52px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity .42s ease, transform .42s ease;
+  overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+.slide.exit   { opacity: 0; transform: translateX(-40px); }
+.slide > * { position: relative; z-index: 1; }
+
+/* Slide header: label + number */
+.sh {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+.sh .lbl {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.sh .num {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: rgba(245,166,35,.3);
+}
+
+/* Typography */
+.display {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700;
+  font-size: 76px;
+  line-height: 0.94;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.display .t { color: var(--teal); }
+.display .c { color: var(--coral); }
+
+.h2 {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.08;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.h2 .t { color: var(--teal); }
+.h2 .c { color: var(--coral); }
+.h2 .g { color: var(--lime); }
+
+.body {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* Formula */
+.fml {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+.fml .t { color: var(--teal); }
+.fml .c { color: var(--coral); }
+.fml .g { color: var(--lime); }
+.fml .d { color: rgba(232,240,255,.3); }
+
+/* Divider */
+.hr { height: 1px; background: var(--line); flex-shrink: 0; }
+
+/* Data row */
+.dr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(245,166,35,.07);
+}
+.dr:last-child { border-bottom: none; }
+.dr .dk { font-size: 18px; color: var(--muted); }
+.dr .dv { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; }
+
+/* Note / callout */
+.note {
+  font-size: 18px;
+  line-height: 1.65;
+  color: rgba(180,210,255,.48);
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+/* Leverage row */
+.lrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border: 1px solid;
+}
+
+/* Footer */
+.sfoot {
+  position: absolute;
+  bottom: 22px;
+  left: 56px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(245,166,35,.18);
+  letter-spacing: .06em;
+  z-index: 10;
+}
+
+/* Controls */
+#progress-bar { width: var(--w); height: 2px; background: rgba(245,166,35,.07); overflow: hidden; }
+#progress-fill { height: 100%; background: var(--teal); transition: width .42s ease; }
+#controls { display: flex; align-items: center; gap: 14px; }
+.btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(245,166,35,.05); border: 1px solid rgba(245,166,35,.16);
+  color: rgba(245,166,35,.55); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; user-select: none;
+}
+.btn:hover { background: rgba(245,166,35,.12); }
+.btn:disabled { opacity: .22; cursor: default; }
+#counter { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(245,166,35,.28); min-width: 48px; text-align: center; }
+#btn-print {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 10px;
+  background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.18);
+  color: rgba(245,166,35,.6); font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+  transition: background .2s;
+}
+#btn-print:hover { background: rgba(245,166,35,.14); }
+
+@media print {
+  @page { size: 900px 1125px; margin: 0; }
+  body { background: #030810 !important; padding: 0; gap: 0; display: block; min-height: unset; }
+  #controls, #progress-bar { display: none !important; }
+  #stage { position: static !important; width: 900px !important; height: 1125px !important; overflow: visible !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+  .slide { position: relative !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; display: flex !important; width: 900px !important; height: 1125px !important; page-break-after: always; break-after: page; overflow: hidden !important; }
+  .slide.exit { display: none !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ── S1: COVER ── -->
+  <div class="slide active" id="s1" style="padding:0;">
+
+    <img src="5.jpg" style="position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center;" alt="">
+    <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(130deg,rgba(8,4,2,.95) 0%,rgba(8,4,2,.80) 35%,rgba(8,4,2,.0) 62%);"></div>
+
+    <div style="position:absolute;inset:0;z-index:2;padding:56px 56px;display:flex;flex-direction:column;justify-content:flex-start;">
+
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.22em;color:#F5A623;text-transform:uppercase;margin-bottom:18px;text-shadow:0 0 18px rgba(245,166,35,.5);">Composição · Risco</div>
+
+      <div style="font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:108px;line-height:0.87;color:#fff;letter-spacing:.04em;text-transform:uppercase;text-shadow:0 4px 32px rgba(0,0,0,.95);margin-bottom:24px;">
+        VOLA<span style="color:#F5A623;text-shadow:0 0 28px rgba(245,166,35,.45);">TI</span>LITY<br><span style="color:#FF3D3D;text-shadow:0 0 32px rgba(255,61,61,.45),0 4px 20px rgba(0,0,0,.9);">DRAG</span>
+      </div>
+
+      <div style="font-family:'Space Mono',monospace;font-size:38px;font-weight:700;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.95);margin-bottom:14px;">
+        r<sub style="font-size:22px;">geo</sub> = r<sub style="font-size:22px;">ari</sub> &minus; <span style="color:#F5A623;">σ²/2</span>
+      </div>
+
+
+    </div>
+
+    <div style="position:absolute;bottom:22px;left:56px;font-family:'Space Mono',monospace;font-size:13px;color:rgba(255,255,255,.75);letter-spacing:.06em;z-index:2;">linkedin.com/in/guilmoreira</div>
+    <div style="position:absolute;bottom:22px;right:56px;font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.15);letter-spacing:.05em;z-index:2;">01 / 06</div>
+  </div>
+
+  <!-- ── S2: INTUIÇÃO ── -->
+  <div class="slide" id="s2">
+
+    <div class="sh">
+      <span class="lbl">O Mecanismo</span>
+      <span class="num">02 / 06</span>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:20px 0 0;">
+
+      <div class="h2" style="margin-bottom:6px;">MÉDIA ZERO.<br><span class="c">PERDA REAL.</span></div>
+      <p class="body" style="margin-bottom:22px;font-size:15px;">−10% seguido de +10%. Média aritmética = 0. O portfólio chegou abaixo do ponto de partida.</p>
+
+      <!-- SVG chart: candlestick-style path with annotated points -->
+      <svg viewBox="0 0 788 480" style="width:100%;flex-shrink:0;overflow:visible;" aria-hidden="true">
+
+        <!-- grid lines -->
+        <line x1="0"   y1="96"  x2="788" y2="96"  stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <line x1="0"   y1="192" x2="788" y2="192" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <line x1="0"   y1="288" x2="788" y2="288" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+        <line x1="0"   y1="384" x2="788" y2="384" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+
+        <!-- baseline: 100 -->
+        <line x1="0" y1="288" x2="788" y2="288" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="6 5"/>
+        <text x="796" y="296" font-family="Space Mono" font-size="18" fill="rgba(255,255,255,.3)">100</text>
+
+        <!-- path: start(100) → day1 queda(90) → day2 subida(99) -->
+        <!-- x: 60, 260, 460, 700 | y: 100→288, 90→336, 99→297.6 mapped to viewBox -->
+        <!-- mapping: value 100 = y288, range 80–115 across y480–y0 → scale ~9.6px per unit -->
+        <!-- 100 → y288 | 90 → y288+96=384 | 99 → y288+9.6≈298 -->
+
+        <!-- segment 1: 100 → 90 (queda) -->
+        <line x1="100" y1="240" x2="380" y2="384" stroke="#E8132A" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- segment 2: 90 → 99 (subida — mas não volta) -->
+        <line x1="380" y1="384" x2="660" y2="298" stroke="#F5A623" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- area fill under path -->
+        <polygon points="100,240 380,384 660,298 660,480 100,480" fill="rgba(232,19,42,.04)"/>
+
+        <!-- origin dot: 100 -->
+        <circle cx="100" cy="240" r="7" fill="#fff" opacity=".9"/>
+        <text x="108" y="224" font-family="Space Mono" font-size="18" font-weight="700" fill="#fff">100</text>
+        <text x="108" y="246" font-family="Space Mono" font-size="18" fill="rgba(255,255,255,.35)">início</text>
+
+        <!-- bottom dot: 90 (day 1) -->
+        <circle cx="380" cy="384" r="7" fill="#E8132A"/>
+        <line cx="380" cy="384" x1="380" y1="291" x2="380" y2="377" stroke="#E8132A" stroke-width="1" stroke-dasharray="3 3" opacity=".4"/>
+        <text x="388" y="376" font-family="Space Mono" font-size="18" font-weight="700" fill="#E8132A">90</text>
+        <text x="388" y="400" font-family="Space Mono" font-size="18" fill="rgba(232,19,42,.6)">−10%</text>
+
+        <!-- end dot: 99 (day 2) -->
+        <circle cx="660" cy="298" r="7" fill="#F5A623"/>
+        <line x1="660" y1="291" x2="660" y2="298" stroke="none"/>
+        <text x="668" y="290" font-family="Space Mono" font-size="18" font-weight="700" fill="#F5A623">99</text>
+        <text x="668" y="314" font-family="Space Mono" font-size="18" fill="rgba(245,166,35,.6)">+10%</text>
+
+        <!-- gap arrow: from 99 line to 100 line at x=660 -->
+        <line x1="720" y1="240" x2="720" y2="298" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+        <line x1="714" y1="240" x2="726" y2="240" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+        <line x1="714" y1="298" x2="726" y2="298" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+        <text x="730" y="275" font-family="Space Mono" font-size="18" fill="rgba(255,255,255,.4)">−1</text>
+
+        <!-- drag label -->
+        <rect x="684" y="252" width="76" height="26" rx="3" fill="rgba(232,19,42,.15)"/>
+        <text x="690" y="270" font-family="Space Mono" font-size="18" fill="#E8132A" letter-spacing="1">DRAG</text>
+
+        <!-- aritmética: linha reta horizontal em 100 (traçada) -->
+        <line x1="100" y1="240" x2="660" y2="240" stroke="rgba(255,255,255,.18)" stroke-width="1.5" stroke-dasharray="8 5"/>
+        <text x="220" y="224" font-family="Space Mono" font-size="18" fill="rgba(255,255,255,.3)" letter-spacing="1">média aritmética = 0%</text>
+
+      </svg>
+
+      <!-- two numbers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;">
+        <div style="padding:14px 18px;border-left:3px solid rgba(255,255,255,.15);">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(255,255,255,.35);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;">Aritmética</div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:36px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.02em;">0,00%</div>
+          <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(255,255,255,.25);margin-top:4px;">(−10 + 10) / 2</div>
+        </div>
+        <div style="padding:14px 18px;border-left:3px solid var(--coral);">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--teal);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;">Geométrica</div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:36px;font-weight:700;color:var(--coral);letter-spacing:.02em;">−1,00%</div>
+          <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(255,255,255,.25);margin-top:4px;">(99 / 100) − 1</div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:14px;font-size:15px;line-height:1.6;color:rgba(255,240,210,.65);">
+        A diferença cresce com σ². Quanto maior a volatilidade, maior o gap entre o retorno esperado e o retorno que chega ao investidor.
+      </div>
+    </div>
+
+    <div class="sfoot">linkedin.com/in/guilmoreira</div>
+  </div>
+
+  <!-- ── S3: FÓRMULA ── -->
+  <div class="slide" id="s3">
+
+    <!-- concentric circles suggesting expanding variance -->
+    <svg viewBox="0 0 900 1125" style="position:absolute;inset:0;z-index:0;pointer-events:none;" aria-hidden="true">
+      <circle cx="800" cy="640" r="420" stroke="#E8132A" stroke-width="1" fill="none" opacity=".04"/>
+      <circle cx="800" cy="640" r="280" stroke="#E8132A" stroke-width="1" fill="none" opacity=".04"/>
+      <circle cx="800" cy="640" r="160" stroke="#E8132A" stroke-width="1" fill="none" opacity=".035"/>
+      <text x="680" y="636" font-family="Space Mono" font-size="11" fill="#E8132A" opacity=".18" letter-spacing="2">σ²</text>
+    </svg>
+
+    <div class="sh">
+      <span class="lbl">A Matemática</span>
+      <span class="num">03 / 06</span>
+    </div>
+
+    <!-- tudo centralizado verticalmente -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:0;padding:20px 0;">
+
+      <!-- fórmula grande -->
+      <div style="margin-bottom:48px;">
+        <div class="fml" style="font-size:72px;line-height:1.0;letter-spacing:.02em;">
+          r<sub style="font-size:38px;font-weight:400;vertical-align:sub;">geo</sub>
+          <span class="d" style="padding:0 12px;font-size:56px;">≈</span>
+          r<sub style="font-size:38px;font-weight:400;vertical-align:sub;">ari</sub>
+          <span class="d" style="padding:0 10px;font-size:56px;">−</span>
+          <span class="c" style="font-size:72px;">σ²</span><span class="d" style="font-size:56px;">/</span><span style="color:#E8132A;font-size:72px;">2</span>
+        </div>
+      </div>
+
+      <!-- três variáveis como blocos side by side -->
+      <div style="display:flex;gap:1px;width:100%;">
+        <div style="flex:1;padding:22px 16px;background:rgba(255,255,255,.03);border-top:2px solid rgba(255,255,255,.15);">
+          <div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:#fff;margin-bottom:10px;">r<sub style="font-size:12px;">geo</sub></div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(255,255,255,.35);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;">retorno geométrico</div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:18px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;">CAGR real</div>
+        </div>
+        <div style="flex:1;padding:22px 16px;background:rgba(255,255,255,.03);border-top:2px solid rgba(255,255,255,.15);">
+          <div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:#fff;margin-bottom:10px;">r<sub style="font-size:12px;">ari</sub></div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(255,255,255,.35);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;">retorno aritmético</div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:18px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;">esperado</div>
+        </div>
+        <div style="flex:1;padding:22px 16px;background:rgba(232,19,42,.06);border-top:2px solid var(--coral);">
+          <div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--coral);margin-bottom:10px;">σ²/2</div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(232,19,42,.5);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;">volatility drag</div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:18px;font-weight:700;color:var(--coral);text-transform:uppercase;letter-spacing:.06em;">custo de composição</div>
+        </div>
+      </div>
+
+      <!-- nota abaixo -->
+      <div style="margin-top:28px;font-size:15px;line-height:1.65;color:rgba(255,240,210,.5);max-width:640px;text-align:center;border-top:1px solid var(--line);padding-top:22px;">
+        O drag cresce com o <strong style="color:rgba(255,255,255,.7);">quadrado de σ</strong>. Dobrar a volatilidade quadruplica o custo. O efeito sobre estratégias alavancadas é não linear e desfavorável.
+      </div>
+
+    </div>
+
+    <div class="sfoot">linkedin.com/in/guilmoreira</div>
+  </div>
+
+  <!-- ── S4: S&P 500 ── -->
+  <div class="slide" id="s4">
+
+    <div style="position:absolute;inset:0;z-index:0;
+      background-image:radial-gradient(circle, rgba(245,166,35,.05) 1px, transparent 1px);
+      background-size:44px 44px;"></div>
+
+    <div class="sh">
+      <span class="lbl">Exemplo Real · S&amp;P 500</span>
+      <span class="num">04 / 06</span>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:28px 0 0;">
+
+      <!-- hero number -->
+      <div style="margin-bottom:6px;">
+        <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(245,166,35,.48);letter-spacing:.22em;text-transform:uppercase;margin-bottom:14px;">Retorno geométrico estimado (CAGR)</div>
+        <div style="font-family:'Josefin Sans',sans-serif;font-size:100px;font-weight:700;line-height:0.88;color:var(--lime);letter-spacing:-.01em;margin-bottom:8px;">
+          10,72<span style="font-size:54px;color:rgba(245,166,35,.55);">%</span>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(232,240,255,.35);letter-spacing:.05em;">vs 12,00% esperado &nbsp;·&nbsp; diferença: −1,28 pp</div>
+      </div>
+
+      <div class="hr" style="margin:24px 0;"></div>
+
+      <!-- calculation -->
+      <div style="flex:1;margin-bottom:20px;">
+        <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(245,166,35,.5);letter-spacing:.18em;text-transform:uppercase;margin-bottom:12px;">Cálculo</div>
+        <div class="dr">
+          <div class="dk" style="font-size:15px;">Retorno aritmético esperado</div>
+          <div class="dv" style="color:rgba(232,240,255,.65);font-size:15px;">12,00%</div>
+        </div>
+        <div class="dr">
+          <div class="dk" style="font-size:15px;">Volatilidade anual (σ)</div>
+          <div class="dv" style="color:rgba(232,240,255,.65);font-size:15px;">16,00%</div>
+        </div>
+        <div class="dr">
+          <div class="dk" style="font-size:15px;">Variância (σ² = 0,16²)</div>
+          <div class="dv" style="color:rgba(232,240,255,.65);font-size:15px;">2,56%</div>
+        </div>
+        <div class="dr" style="border-bottom:2px solid rgba(232,19,42,.2);padding-bottom:14px;">
+          <div class="dk" style="color:var(--coral);font-size:15px;">Volatility drag (σ² / 2)</div>
+          <div class="dv" style="color:var(--coral);font-size:15px;">− 1,28%</div>
+        </div>
+        <div class="dr" style="border-bottom:none;padding-top:14px;">
+          <div class="dk" style="font-family:'Josefin Sans',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text);">CAGR Real</div>
+          <div class="dv" style="font-family:'Josefin Sans',sans-serif;font-size:24px;color:var(--lime);">10,72%</div>
+        </div>
+      </div>
+
+      <div class="note">
+        O drag é silencioso, permanente e se acumula em períodos longos. Em 20 anos, 1,28 pp ao ano compõe uma diferença de capital significativa.
+      </div>
+    </div>
+
+    <div class="sfoot">linkedin.com/in/guilmoreira</div>
+  </div>
+
+  <!-- ── S5: ALAVANCAGEM ── -->
+  <div class="slide" id="s5">
+
+    <div class="sh">
+      <span class="lbl">Alavancagem · Drag Quadrático</span>
+      <span class="num">05 / 06</span>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:22px 0 0;">
+
+      <div class="h2" style="font-size:28px;margin-bottom:10px;">O DRAG CRESCE COMO <span class="c">L²</span>.<br>DOBRAR A ALAVANCAGEM QUADRUPLICA O CUSTO.</div>
+
+      <!-- fórmula inline -->
+      <div style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:20px;letter-spacing:.03em;">
+        drag(L) &nbsp;=&nbsp; <span style="color:#E8132A;">L²</span> &nbsp;×&nbsp; σ²/2
+      </div>
+
+      <!-- SVG: barras de drag para 1×, 2×, 3× — escala: 1%=24px, baseline y=280 -->
+      <svg viewBox="0 0 788 300" style="width:100%;flex-shrink:0;overflow:visible;margin-bottom:20px;">
+
+        <!-- baseline -->
+        <line x1="0" y1="280" x2="788" y2="280" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+
+        <!-- ── 1× — drag 1.28% → 31px ── -->
+        <rect x="77" y="249" width="160" height="31" fill="#E8132A" opacity=".75" rx="3"/>
+        <text x="157" y="238" font-family="Space Mono" font-size="17" font-weight="700" fill="#E8132A" text-anchor="middle">1,28%</text>
+        <text x="157" y="298" font-family="Josefin Sans" font-size="24" font-weight="700" fill="rgba(255,255,255,.75)" text-anchor="middle" letter-spacing="2">1×</text>
+
+        <!-- ── 2× — drag 5.12% → 123px ── -->
+        <rect x="314" y="157" width="160" height="123" fill="#E8132A" opacity=".82" rx="3"/>
+        <text x="394" y="146" font-family="Space Mono" font-size="17" font-weight="700" fill="#E8132A" text-anchor="middle">5,12%</text>
+        <text x="394" y="298" font-family="Josefin Sans" font-size="24" font-weight="700" fill="rgba(255,255,255,.75)" text-anchor="middle" letter-spacing="2">2×</text>
+
+        <!-- ── 3× — drag 11.52% → 277px → clip at y=10, arrow ── -->
+        <rect x="551" y="10" width="160" height="270" fill="#E8132A" opacity=".90" rx="3"/>
+        <polygon points="631,2 619,13 643,13" fill="#E8132A" opacity=".9"/>
+        <text x="631" y="40" font-family="Space Mono" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">11,52%</text>
+        <text x="631" y="298" font-family="Josefin Sans" font-size="24" font-weight="700" fill="rgba(255,255,255,.75)" text-anchor="middle" letter-spacing="2">3×</text>
+
+        <!-- fator L² labels -->
+        <text x="157" y="268" font-family="Space Mono" font-size="15" fill="rgba(255,255,255,.6)" text-anchor="middle">L²=1</text>
+        <text x="394" y="210" font-family="Space Mono" font-size="15" fill="rgba(255,255,255,.7)" text-anchor="middle">L²=4</text>
+        <text x="631" y="58" font-family="Space Mono" font-size="15" fill="rgba(255,255,255,.8)" text-anchor="middle">L²=9</text>
+
+      </svg>
+
+      <!-- tabela: r_ari, drag, CAGR real -->
+      <div style="display:grid;grid-template-columns:1fr repeat(3,1fr);gap:1px;background:rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-bottom:20px;">
+
+        <!-- headers -->
+        <div style="padding:12px 14px;background:rgba(255,255,255,.02);">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(255,255,255,.25);letter-spacing:.14em;text-transform:uppercase;">S&amp;P 500 · σ=16%</div>
+        </div>
+        <div style="padding:12px 14px;background:rgba(255,255,255,.02);text-align:center;">
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:20px;font-weight:700;color:rgba(255,255,255,.65);">1×</div>
+        </div>
+        <div style="padding:12px 14px;background:rgba(255,255,255,.02);text-align:center;">
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:20px;font-weight:700;color:rgba(255,255,255,.65);">2×</div>
+        </div>
+        <div style="padding:12px 14px;background:rgba(255,255,255,.02);text-align:center;">
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:20px;font-weight:700;color:var(--coral);">3×</div>
+        </div>
+
+        <!-- r_ari -->
+        <div style="padding:10px 14px;background:var(--navy);">
+          <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(255,255,255,.35);">r_ari esperado</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;color:rgba(255,255,255,.55);">12,00%</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;color:rgba(255,255,255,.55);">24,00%</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;color:rgba(255,255,255,.55);">36,00%</div>
+        </div>
+
+        <!-- drag -->
+        <div style="padding:10px 14px;background:rgba(232,19,42,.04);">
+          <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(232,19,42,.6);">drag L²σ²/2</div>
+        </div>
+        <div style="padding:10px 14px;background:rgba(232,19,42,.04);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#E8132A;">−1,28%</div>
+        </div>
+        <div style="padding:10px 14px;background:rgba(232,19,42,.04);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#E8132A;">−5,12%</div>
+        </div>
+        <div style="padding:10px 14px;background:rgba(232,19,42,.04);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#E8132A;">−11,52%</div>
+        </div>
+
+        <!-- CAGR real -->
+        <div style="padding:10px 14px;background:var(--navy);">
+          <div style="font-family:'Space Mono',monospace;font-size:18px;color:rgba(255,255,255,.35);">CAGR real</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#22C55E;">10,72%</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#22C55E;">18,88%</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--navy);text-align:center;">
+          <div style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#22C55E;">24,48%</div>
+        </div>
+
+      </div>
+
+      <div class="note" style="font-size:15px;line-height:1.65;color:rgba(255,240,210,.55);">
+        ETFs alavancados com rebalanceamento diário sofrem ainda um custo adicional: o <span style="color:rgba(245,166,35,.9);font-style:italic;">volatility decay</span> (beta slippage). Vale investigar separadamente.
+      </div>
+    </div>
+
+    <div class="sfoot">linkedin.com/in/guilmoreira</div>
+  </div>
+
+  <!-- ── S6: CLOSE ── -->
+  <div class="slide" id="s6">
+
+    <img src="1.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;" alt="">
+    <div style="position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 110% 65% at 0% 100%,rgba(8,13,8,.96) 0%,rgba(8,13,8,.82) 35%,rgba(8,13,8,.35) 62%,rgba(8,13,8,.06) 100%);"></div>
+
+    <div class="sh">
+      <span class="lbl">Para Fechar</span>
+      <span class="num" style="color:rgba(245,166,35,.65);font-size:11px;">06 / 06</span>
+    </div>
+
+    <!-- conteúdo ancorado na base -->
+    <div style="position:absolute;bottom:56px;left:56px;right:56px;z-index:1;display:flex;flex-direction:column;">
+
+      <div class="display" style="font-size:50px;line-height:1.0;margin-bottom:28px;text-shadow:0 3px 32px rgba(0,0,0,.95),0 1px 8px rgba(0,0,0,.9);">
+        VOLATILIDADE<br>NÃO É SÓ<br>DESVIO PADRÃO.<br><span class="c">É UM</span> <span class="t">CUSTO</span> <span class="c">REAL.</span>
+      </div>
+
+      <div class="hr" style="margin-bottom:22px;"></div>
+
+      <p class="body" style="max-width:700px;font-size:17px;color:#ffffff;line-height:1.65;">
+        O drag é silencioso, permanente e cresce quadraticamente com σ. Em horizontes longos, ignorar esse custo equivale a superestimar sistematicamente o retorno composto.
+      </p>
+    </div>
+
+    <div class="sfoot" style="font-size:12px;color:#F5A623;letter-spacing:.08em;">linkedin.com/in/guilmoreira</div>
+  </div>
+
+</div>
+
+<div id="progress-bar"><div id="progress-fill" style="width:16.67%"></div></div>
+
+<div id="controls">
+  <button class="btn" id="btn-prev" disabled>&#8592;</button>
+  <span id="counter">1 / 6</span>
+  <button class="btn" id="btn-next">&#8594;</button>
+  <button id="btn-print">EXPORTAR PDF</button>
+</div>
+
+<script>
+  const slides  = document.querySelectorAll('.slide');
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const N = slides.length;
+  let cur = 0;
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(() => slides[prev].classList.remove('exit'), 430);
+    counter.textContent = (cur + 1) + ' / ' + N;
+    fill.style.width    = ((cur + 1) / N * 100).toFixed(2) + '%';
+    btnPrev.disabled    = cur === 0;
+    btnNext.disabled    = cur === N - 1;
+  }
+
+  btnPrev.addEventListener('click', () => { if (cur > 0)   goTo(cur - 1); });
+  btnNext.addEventListener('click', () => { if (cur < N-1) goTo(cur + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   btnPrev.click();
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

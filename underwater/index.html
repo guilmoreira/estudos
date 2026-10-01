@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Underwater e Taxa de Performance</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #1C1C1C;
+    }
+
+    #app {
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* Oculta elementos de UI do Excalidraw que não fazem sentido em modo view */
+    .excalidraw .App-toolbar,
+    .excalidraw .App-toolbar-container,
+    .excalidraw .footer-center,
+    .excalidraw .zoom-actions,
+    .excalidraw .undo-redo-buttons {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@excalidraw/excalidraw@0.17.6/dist/excalidraw.production.min.js"></script>
+
+  <script>
+    const SCENE = {
+      elements: [
+        {
+          "id": "bg1", "type": "rectangle",
+          "x": 80, "y": 100, "width": 460, "height": 320, "angle": 0,
+          "strokeColor": "transparent", "backgroundColor": "#eff6ff",
+          "fillStyle": "solid", "strokeWidth": 0, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 35
+        },
+        {
+          "id": "bg2", "type": "rectangle",
+          "x": 540, "y": 100, "width": 460, "height": 320, "angle": 0,
+          "strokeColor": "transparent", "backgroundColor": "#f0fdf4",
+          "fillStyle": "solid", "strokeWidth": 0, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 35
+        },
+        {
+          "id": "t-title", "type": "text",
+          "x": 80, "y": 25, "width": 840, "height": 36, "angle": 0,
+          "strokeColor": "#1e40af", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Underwater e Taxa de Performance | dois anos, duas realidades",
+          "fontSize": 24, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 22
+        },
+        {
+          "id": "t-sub", "type": "text",
+          "x": 80, "y": 66, "width": 720, "height": 22, "angle": 0,
+          "strokeColor": "#64748b", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "o mesmo cotista pode ter uma aplicacao pagando e outra nao, dependendo de quando entrou",
+          "fontSize": 14, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 12
+        },
+        {
+          "id": "l-xaxis", "type": "line",
+          "x": 80, "y": 420, "width": 940, "height": 0, "angle": 0,
+          "strokeColor": "#cbd5e1", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[940,0]], "lastCommittedPoint": [940,0],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "l-divider", "type": "line",
+          "x": 540, "y": 100, "width": 0, "height": 320, "angle": 0,
+          "strokeColor": "#94a3b8", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+          "roughness": 0, "opacity": 80,
+          "points": [[0,0],[0,320]], "lastCommittedPoint": [0,320],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-ano1", "type": "text",
+          "x": 262, "y": 106, "width": 80, "height": 22, "angle": 0,
+          "strokeColor": "#3b82f6", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Ano 1", "fontSize": 16, "fontFamily": 1,
+          "textAlign": "center", "verticalAlign": "top", "baseline": 14
+        },
+        {
+          "id": "t-ano2", "type": "text",
+          "x": 722, "y": 106, "width": 80, "height": 22, "angle": 0,
+          "strokeColor": "#64748b", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Ano 2", "fontSize": 16, "fontFamily": 1,
+          "textAlign": "center", "verticalAlign": "top", "baseline": 14
+        },
+        {
+          "id": "l-nav", "type": "line",
+          "x": 120, "y": 364, "width": 850, "height": 126, "angle": 0,
+          "strokeColor": "#3b82f6", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 100,
+          "points": [[0,0],[180,-42],[420,-112],[530,-56],[600,-14],[730,-34],[850,-51]],
+          "lastCommittedPoint": [850,-51],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "e-cotaa", "type": "ellipse",
+          "x": 113, "y": 357, "width": 14, "height": 14, "angle": 0,
+          "strokeColor": "#c2410c", "backgroundColor": "#fed7aa",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100
+        },
+        {
+          "id": "l-cotaa-v", "type": "line",
+          "x": 120, "y": 370, "width": 0, "height": 50, "angle": 0,
+          "strokeColor": "#c2410c", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+          "roughness": 0, "opacity": 50,
+          "points": [[0,0],[0,50]], "lastCommittedPoint": [0,50],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-cotaa", "type": "text",
+          "x": 58, "y": 428, "width": 130, "height": 44, "angle": 0,
+          "strokeColor": "#c2410c", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Cota A entra\nNAV = 100", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "center", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "e-ano1end", "type": "ellipse",
+          "x": 533, "y": 245, "width": 14, "height": 14, "angle": 0,
+          "strokeColor": "#b45309", "backgroundColor": "#fef3c7",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100
+        },
+        {
+          "id": "t-pf-ano1", "type": "text",
+          "x": 385, "y": 195, "width": 175, "height": 44, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Perf Fee cobrada\nfim do Ano 1", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "center", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "a-pf-ano1", "type": "arrow",
+          "x": 504, "y": 237, "width": 29, "height": 8, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[29,8]], "lastCommittedPoint": [29,8],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": "arrow"
+        },
+        {
+          "id": "l-hwma", "type": "line",
+          "x": 120, "y": 252, "width": 880, "height": 0, "angle": 0,
+          "strokeColor": "#b45309", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[880,0]], "lastCommittedPoint": [880,0],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-hwma", "type": "text",
+          "x": 135, "y": 229, "width": 265, "height": 22, "angle": 0,
+          "strokeColor": "#b45309", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Marca d Agua Cota A = 140", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "e-cotab", "type": "ellipse",
+          "x": 713, "y": 343, "width": 14, "height": 14, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "#a7f3d0",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100
+        },
+        {
+          "id": "l-cotab-v", "type": "line",
+          "x": 720, "y": 350, "width": 0, "height": 70, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+          "roughness": 0, "opacity": 50,
+          "points": [[0,0],[0,70]], "lastCommittedPoint": [0,70],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-cotab", "type": "text",
+          "x": 660, "y": 428, "width": 145, "height": 44, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Cota B entra\nNAV = 105", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "center", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "l-hwmb", "type": "line",
+          "x": 720, "y": 350, "width": 280, "height": 0, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "dashed",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[280,0]], "lastCommittedPoint": [280,0],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-hwmb", "type": "text",
+          "x": 730, "y": 357, "width": 245, "height": 22, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Marca d Agua Cota B = 105", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "e-ano2end", "type": "ellipse",
+          "x": 963, "y": 306, "width": 14, "height": 14, "angle": 0,
+          "strokeColor": "#1e3a5f", "backgroundColor": "#3b82f6",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100
+        },
+        {
+          "id": "l-current", "type": "line",
+          "x": 80, "y": 313, "width": 890, "height": 0, "angle": 0,
+          "strokeColor": "#3b82f6", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dotted",
+          "roughness": 0, "opacity": 40,
+          "points": [[0,0],[890,0]], "lastCommittedPoint": [890,0],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": null, "endArrowhead": null
+        },
+        {
+          "id": "t-current", "type": "text",
+          "x": 870, "y": 288, "width": 140, "height": 22, "angle": 0,
+          "strokeColor": "#1e40af", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Hoje: NAV = 118", "fontSize": 13, "fontFamily": 1,
+          "textAlign": "right", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "a-underwater", "type": "arrow",
+          "x": 1038, "y": 252, "width": 0, "height": 61, "angle": 0,
+          "strokeColor": "#dc2626", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[0,61]], "lastCommittedPoint": [0,61],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": "arrow", "endArrowhead": "arrow"
+        },
+        {
+          "id": "t-underwater", "type": "text",
+          "x": 1050, "y": 264, "width": 145, "height": 66, "angle": 0,
+          "strokeColor": "#dc2626", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "UNDERWATER\nCota A\nSem Perf Fee\nno Ano 2", "fontSize": 11, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 9
+        },
+        {
+          "id": "a-abovewater", "type": "arrow",
+          "x": 1038, "y": 313, "width": 0, "height": 37, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "points": [[0,0],[0,37]], "lastCommittedPoint": [0,37],
+          "startBinding": null, "endBinding": null,
+          "startArrowhead": "arrow", "endArrowhead": "arrow"
+        },
+        {
+          "id": "t-abovewater", "type": "text",
+          "x": 1050, "y": 320, "width": 145, "height": 55, "angle": 0,
+          "strokeColor": "#047857", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Cota B\nACIMA\nPerf Fee cobrada\nno Ano 2", "fontSize": 11, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 9
+        },
+        {
+          "id": "r-explain", "type": "rectangle",
+          "x": 80, "y": 495, "width": 620, "height": 115, "angle": 0,
+          "strokeColor": "#3b82f6", "backgroundColor": "#eff6ff",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 100
+        },
+        {
+          "id": "t-explain", "type": "text",
+          "x": 93, "y": 507, "width": 597, "height": 91, "angle": 0,
+          "strokeColor": "#1e40af", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "O mesmo cotista pode ter uma aplicacao pagando taxa de performance e outra nao.\nIsso ocorre porque cada entrada cria uma nova cota com seu proprio HWM.\nA Cota A entrou antes do pico, teve o HWM elevado para 140 e agora esta abaixo.\nA Cota B entrou apos a queda, tem HWM = 105 e ja superou esse nivel no Ano 2.",
+          "fontSize": 13, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 11
+        },
+        {
+          "id": "r-calc", "type": "rectangle",
+          "x": 720, "y": 495, "width": 475, "height": 115, "angle": 0,
+          "strokeColor": "#6d28d9", "backgroundColor": "#f5f3ff",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 100
+        },
+        {
+          "id": "t-calc", "type": "text",
+          "x": 733, "y": 507, "width": 450, "height": 91, "angle": 0,
+          "strokeColor": "#4c1d95", "backgroundColor": "transparent",
+          "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 100,
+          "text": "Quem calcula a taxa de performance?\nO administrador do fundo e o responsavel pelo calculo.\nEle apura o NAV diario, verifica se o HWM foi superado\nao final do periodo e debita a taxa no patrimonio do fundo.",
+          "fontSize": 13, "fontFamily": 1,
+          "textAlign": "left", "verticalAlign": "top", "baseline": 11
+        }
+      ],
+      appState: {
+        viewBackgroundColor: "#ffffff",
+        currentItemFontFamily: 1
+      },
+      scrollToContent: true
+    };
+
+    const { createElement: h, useState, useEffect } = React;
+
+    function DiagramPage() {
+      const [api, setApi] = useState(null);
+
+      useEffect(() => {
+        if (!api) return;
+        const timer = setTimeout(() => {
+          api.scrollToContent(SCENE.elements, {
+            fitToViewport: true,
+            viewportZoomFactor: 0.9,
+          });
+        }, 80);
+        return () => clearTimeout(timer);
+      }, [api]);
+
+      return h(ExcalidrawLib.Excalidraw, {
+        excalidrawAPI: setApi,
+        initialData: SCENE,
+        viewModeEnabled: true,
+        zenModeEnabled: false,
+        gridModeEnabled: false,
+        isCollaborating: false,
+        UIOptions: {
+          canvasActions: {
+            loadScene:        false,
+            export:           false,
+            saveToActiveFile: false,
+            saveAsImage:      false,
+            clearCanvas:      false,
+            changeViewBackgroundColor: false,
+          },
+          tools: { image: false },
+        },
+      });
+    }
+
+    ReactDOM.createRoot(document.getElementById('app')).render(h(DiagramPage));
+  </script>
+</body>
+</html>
