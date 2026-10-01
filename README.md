@@ -1,1 +1,1 @@
-# mercado_financeiro
+# Estudos, ideias e Mercado
